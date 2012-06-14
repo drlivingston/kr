@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http//www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License 1.0</name>
+      <url>http://opensource.org/licenses/eclipse-1.0.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <properties>
+    <clojure.version>1.4.0</clojure.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- are these necessary there is ${project.version} -->
+    <!--<kr.version>1.3.0-SNAPSHOT</kr.version>
+    <kr.groupId>edu.ucdenver.ccp</kr.groupId>-->
+
+    <!-- latest versions works with latest jenasesame lib -->
+    <!--<ver.jena>2.6.4</ver.jena>
+    <ver.arq>2.8.7</ver.arq>-->
+    <ver.arq>2.9.0-incubating</ver.arq>
+    <ver.sesame>2.6.6</ver.sesame>
+
+    <ver.log4j>1.2.17</ver.log4j>
+    <ver.slf4j>1.6.5</ver.slf4j>
+  </properties>
+
+  <groupId>edu.ucdenver.ccp</groupId>
+  <version>1.3.0-SNAPSHOT</version>
+  <artifactId>kr</artifactId>
+  <packaging>pom</packaging>
+
+  <name>${project.artifactId}</name>
+  <description>knowledge representation and reasoning tools</description>
+
+  <modules>
+    <module>kr-core</module>
+    <module>kr-jena</module>
+    <module>kr-sesame</module>
+    <module>kr-backend</module>
+    <!--<module>kr-examples</module>-->
+  </modules>
+
+
+  <scm>
+    <connection>scm:git:git://github.com/drlivingston/kr.git</connection>
+    <developerConnection>scm:git:git://github.com/drlivingston/kr.git</developerConnection>
+    <url>http://github.com/drlivingston/kr</url>
+  </scm>
+
+  <distributionManagement>
+    <!--
+    <snapshotRepository>
+      <id>clojars.org</id>
+      <name>Clojars Repository</name>
+      <url>https://clojars.org/repo/</url>
+    </snapshotRepository>
+    -->
+    <repository>
+      <id>clojars.org</id>
+      <name>Clojars Repository</name>
+      <url>https://www.clojars.org/repo/</url>
+    </repository>
+  </distributionManagement>
+ 
+
+  <dependencies>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>${clojure.version}</version>
+    </dependency>
+    <!-- these should go into dependency managment and then only 
+         brought in as needed -->
+<!-- is this really needed any more?
+    <dependency>
+      <groupId>org.clojure.contrib</groupId>
+      <artifactId>repl-utils</artifactId>
+      <version>1.3.0-alpha4</version>
+    </dependency>
+-->
+    <!--<dependency>
+      <groupId>org.clojure.contrib</groupId>
+      <artifactId>stream-utils</artifactId>
+      <version>1.3.0-alpha4</version>
+    </dependency>-->
+  </dependencies>
+
+  <dependencyManagement>
+  <dependencies>
+
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>java.classpath</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.unify</artifactId>
+      <version>0.5.2</version>
+    </dependency>
+    -->
+
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-runtime</artifactId>
+      <!-- sesame is the parent pom that load nothing
+           sesame-runtime brings in everything under the sun
+      <artifactId>sesame</artifactId> -->
+      <version>${ver.sesame}</version>
+      <!--<type>pom</type>-->
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-queryresultio</artifactId>
+      <version>${ver.sesame}</version>
+      <!--<type>pom</type>-->
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-queryresultio-sparqlxml</artifactId>
+      <version>${ver.sesame}</version>
+      <!--<type>pom</type>-->
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-queryresultio-binary</artifactId>
+      <version>${ver.sesame}</version>
+      <!--<type>pom</type>-->
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-arq</artifactId>
+      <version>${ver.arq}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${ver.log4j}</version>
+      <!--<version>1.2.12</version>-->
+      <!--<scope>compile</scope>-->
+    </dependency>
+    
+    <!-- I guess OpenRDF needs the following two things
+         although I don't know why it doesn't declare the dependencies?-->
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${ver.slf4j}</version>
+    </dependency>
+   
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>swank-clojure</groupId>
+      <artifactId>swank-clojure</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+    
+  </dependencies>
+  </dependencyManagement>
+
+
+  <repositories>
+
+    <repository>
+      <id>clojars</id>
+      <url>http://clojars.org/repo</url>
+    </repository>
+
+    <!-- this is where OpenRDF / Sesame lives-->
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>aduna-releases</id>
+      <name>Aduna Open Source - Maven releases</name>
+      <url>http://repo.aduna-software.org/maven2/releases</url>
+    </repository>
+
+    <!-- this is where Jena lives-->
+    <repository>
+      <id>apache-repo-releases</id>
+      <url>https://repository.apache.org/content/repositories/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+
+    <!-- jena also seems to need this for some jmx dependencies -->
+    <repository>
+      <id>repository.jboss.org-public</id>
+      <name>JBoss.org Maven repository</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public</url>
+    </repository>  
+
+
+  </repositories>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/clojure</directory>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>com.theoryinpractise</groupId>
+        <artifactId>clojure-maven-plugin</artifactId>
+        <version>1.3.9</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>compile-clojure</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+
+        </executions>
+        <configuration>
+          <!--<vmargs>-d64 -Xmx4G</vmargs>-->
+          <!-- command line override -Dclojure.vmargs="-d64 -Xmx4G" -->
+        </configuration>
+        <!--<configuration>
+          <sourceDirectories>
+            <sourceDirectory>src/main/clojure</sourceDirectory>
+          </sourceDirectories>
+        </configuration>-->
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <testClassesDirectory>src/test/clojure/</testClassesDirectory>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <!--<version>2.3.1</version>-->
+        <configuration>
+          <addSchema>false</addSchema>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+  </build>
+</project>
