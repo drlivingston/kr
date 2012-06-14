@@ -46,9 +46,9 @@
 
 
   <scm>
-    <connection>scm:git:git://github.com/drlivingston/kr.git</connection>
-    <developerConnection>scm:git:git://github.com/drlivingston/kr.git</developerConnection>
-    <url>http://github.com/drlivingston/kr</url>
+    <connection>scm:git:https://www.github.com/drlivingston/kr.git</connection>
+    <developerConnection>scm:git:https://www.github.com/drlivingston/kr.git</developerConnection>
+    <url>https://www.github.com/drlivingston/kr</url>
   </scm>
 
   <distributionManagement>
