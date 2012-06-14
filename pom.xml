@@ -62,7 +62,7 @@
     <repository>
       <id>clojars.org</id>
       <name>Clojars Repository</name>
-      <url>https://www.clojars.org/repo/</url>
+      <url>https://clojars.org/repo/</url>
     </repository>
   </distributionManagement>
  
