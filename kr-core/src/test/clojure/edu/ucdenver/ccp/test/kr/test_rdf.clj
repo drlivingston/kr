@@ -46,7 +46,9 @@
            (is (= 'foo/a
                   (convert-string-to-sym *kb* "http://www.example.org/a")))))
 
-         
+
+
+
 
 (kb-test load-stream nil
          (load-rdf *kb* 
@@ -69,6 +71,25 @@
 
 (kb-test test-add-triple nil
          (is (nil? (add *kb* 'ex/a 'ex/b 'ex/c))))
+
+(kb-test test-multiple-ways-to-add nil
+         (let [kb *kb*]
+           ;;in parts
+           (add kb 'ex/KevinL 'rdf/type 'ex/Person)
+
+           ;;as a triple
+           (add kb '(ex/KevinL foaf/name "Kevin Livingston"))
+           
+           ;;to the 'default' kb
+           (binding [*kb* kb]
+             (add '(ex/KevinL foaf/mbox "<mailto:kevin@example.org>")))
+           
+           ;;multiple triples
+           (add-statements kb
+                           '((ex/BobL rdf/type ex/Person)
+                             (ex/BobL foaf/name "Bob Livingston")
+                             (ex/BobL foaf/mbox "<mailto:bob@example.org>")))))
+
 
 (kb-test test-one-triple nil
          (is (nil? (add! *kb* 'ex/a 'ex/b 'ex/c)))

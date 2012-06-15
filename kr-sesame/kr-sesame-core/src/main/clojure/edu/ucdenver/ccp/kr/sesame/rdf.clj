@@ -228,9 +228,15 @@
 
 
 (defn sesame-add-statements
-  ([kb stmts] (.add (connection! kb) ^Iterable stmts (sesame-context-array)))
+  ([kb stmts] (.add (connection! kb)
+                    ^Iterable (map (fn [s]
+                                     (apply statement kb s))
+                                   stmts)
+                    (sesame-context-array)))
   ([kb stmts context] (.add (connection! kb) 
-                            ^Iterable stmts 
+                            ^Iterable (map (fn [s]
+                                             (apply statement kb s))
+                                           stmts)
                             (sesame-context-array kb context))))
 
 (defmulti convert-to-sesame-type identity)

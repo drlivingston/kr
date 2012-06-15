@@ -232,13 +232,15 @@
   ([kb stmts]
      (when (and *force-add-named-to-default*
                 (not (default-model-active? kb)))
-       (let [target-model (default-model kb)]
+       (let [target-model (default-model kb)
+             active-kb (set-active-model kb target-model)]
          (.add target-model
-               ^Iterable (map (partial jena-create-statement target-model)
+               ^Iterable (map (partial jena-create-statement active-kb)
                               stmts))))
-     (let [target-model (model kb)]
+     (let [target-model (model kb)
+           active-kb (set-active-model kb target-model)]
        (.add target-model
-             ^Iterable (map (partial jena-create-statement target-model)
+             ^Iterable (map (partial jena-create-statement active-kb)
                             stmts)))
      nil)
   ([kb stmts context]
