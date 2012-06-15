@@ -68,8 +68,7 @@ Query with triple patterns (SPARQL):
 The examples also provide details on how to interact with a KB, with run-able poms:
 https://github.com/drlivingston/kr/tree/master/kr-examples
 
-jump to the code for one example:
-https://github.com/drlivingston/kr/blob/master/kr-examples/sesame-mem-kb/src/main/clojure/edu/ucdenver/ccp/kr/examples/sesame_mem_kb.clj
+These include examples of connecting to a remote repository and a local in-memory repository.
 
 
 More detailed uses can be found in the test cases for both the KB, RDF, and SPARQL APIs.  They are here:

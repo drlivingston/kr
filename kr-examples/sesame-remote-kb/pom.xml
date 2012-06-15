@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.ucdenver.ccp.kr.examples</groupId>
-  <artifactId>sesame-mem-kb</artifactId>
-  <version>1.4.0-SNAPSHOT</version>
+  <artifactId>sesame-remote-kb</artifactId>
+  <version>1.4.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
-  <description>Example Sesame Memory KB</description>
+  <description>Example Sesame Remote KB</description>
 
   <dependencies>
     <dependency>
