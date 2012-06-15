@@ -27,7 +27,7 @@
     <dependency>
       <groupId>edu.ucdenver.ccp</groupId>
       <artifactId>kr-sesame-core</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.1</version>
     </dependency>
 
     <dependency>

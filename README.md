@@ -26,22 +26,51 @@ a kb instance can then be acquired with the kb function, for example:
 (kb :sesame-mem)  ; an in-memory sesame kb
 ```
 The `kb` function can take keyword arguments such as `:sesame-mem` or `:jena-mem` or it can take names of several native jena or sesame objects or pre-constructed jena or sesame instances to create a `kb` wrapper around (e.g., a jena `Model` or a sesame `Sail`).
- 
+
+kb's need some help knowing what the namespace mappings are, the server mappings can be brought down from a third party kb by calling `(synch-ns-mappings my-kb)` or you can add a few:
+```clj
+(register-namespaces my-kb
+                     '(("ex" "http://www.example.org/") 
+                       ("rdf" "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+                       ("foaf" "http://xmlns.com/foaf/0.1/")))
+;;the return value is the new modified kb - hang onto it
+```
 
 ## Basic Use
 
 Once you have a KB you can load rdf triple or files:
-
+```clj
+  ;;in parts
+  (add my-kb 'ex/KevinL 'rdf/type 'ex/Person)
+  ;;as a triple
+  (add my-kb '(ex/KevinL foaf/name "Kevin Livingston"))
+```
 
 Query for RDF triples:
+```clj
+(ask-rdf my-kb nil nil 'ex/Person)
+;;true
 
+(query-rdf my-kb nil nil 'ex/Person)
+;;((ex/KevinL rdf/type ex/Person))
+```
 
 Query with triple patterns (SPARQL):
-
+```clj
+(query my-kb '((?/person rdf/type ex/Person)
+               (?/person foaf/name ?/name)
+               (:optional ((?/person foaf/mbox ?/email)))))
+;;({?/name "Kevin Livingston", ?/person ex/KevinL})
+```
 
 ## More Details
 
-The examples also provide details on how to interact with a KB (to appear).
+The examples also provide details on how to interact with a KB, with run-able poms:
+https://github.com/drlivingston/kr/tree/master/kr-examples
+
+jump to the code for one example:
+https://github.com/drlivingston/kr/blob/master/kr-examples/sesame-mem-kb/src/main/clojure/edu/ucdenver/ccp/kr/examples/sesame_mem_kb.clj
+
 
 More detailed uses can be found in the test cases for both the KB, RDF, and SPARQL APIs.  They are here:
 https://github.com/drlivingston/kr/tree/master/kr-core/src/test/clojure/edu/ucdenver/ccp/test/kr

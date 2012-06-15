@@ -56,6 +56,9 @@
 ;;; sparql api
 ;;; --------------------------------------------------------
 
+;; symbols in the ? ns are assumed to be capturing variables
+;; symbols in the _ ns are blank nodes
+;;    they function as non-capturing in sparql
 (def names-and-email-pattern
   '((_/person rdf/type ex/Person)
     (_/person foaf/name ?/name)
@@ -68,6 +71,33 @@
 ;;sparql api ask
 (defn query-names-with-email [kb]
   (query kb names-and-email-pattern))
+
+;;; --------------------------------------------------------
+;;; REPL trace:
+;;; --------------------------------------------------------
+
+;; user> (use 'edu.ucdenver.ccp.kr.examples.sesame-mem-kb)
+;; nil
+
+;; user> (def my-kb (add-namespaces
+;;                   (sesame-memory-test-kb)))
+;; #'user/my-kb
+
+;; user> (add-triples my-kb)
+;; nil
+
+;; user> (ask-person my-kb)
+;; true
+
+;; user> (query-person my-kb)
+;; ((ex/KevinL rdf/type ex/Person) (ex/BobL rdf/type ex/Person))
+
+
+;; user> (ask-names-with-email my-kb)
+;; true
+
+;; user> (query-names-with-email my-kb)
+;; ({?/name "Kevin Livingston", ?/email "<mailto:kevin@example.org>"} {?/name "Bob Livingston", ?/email "<mailto:bob@example.org>"})
 
 ;;; --------------------------------------------------------
 ;;; END
