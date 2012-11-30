@@ -29,7 +29,7 @@
   </properties>
 
   <groupId>edu.ucdenver.ccp</groupId>
-  <version>1.4.3</version>
+  <version>1.4.4-SNAPSHOT</version>
   <artifactId>kr</artifactId>
   <packaging>pom</packaging>
 
