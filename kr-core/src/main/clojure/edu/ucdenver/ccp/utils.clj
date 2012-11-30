@@ -5,6 +5,8 @@
           (java.util.jar JarFile JarEntry)
           java.security.MessageDigest
           java.math.BigInteger))
+;;org.apache.commons.codec.binary.Base64
+
 
 (def ^:dynamic *default-file-encoding* "UTF-8")
 
@@ -28,9 +30,20 @@
         (BigInteger. 1
                      (.digest (doto (MessageDigest/getInstance "MD5")
                                 (.reset)
-                                (.update (.getBytes (str x))))))
+                                (.update (.getBytes (str x) "UTF-8")))))
         16))
   ([x & rest] (md5 (apply str x rest))))
+
+;;need a set of flags to control encoding:
+;; hex, 32, 36, 64 (+/- url safe)
+;;
+
+;; (defn sha-1
+;;   ([x] (Base64/encodeBase64URLSafeString
+;;         ^bytes (.digest (doto (MessageDigest/getInstance "SHA1")
+;;                           (.reset)
+;;                           (.update (.getBytes (str x) "UTF-8"))))))
+;;   ([x & rest] (sha-1 (apply str x rest))))
 
 
 

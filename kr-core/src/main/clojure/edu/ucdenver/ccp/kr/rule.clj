@@ -44,11 +44,17 @@
   (all-input file))
 ;;(read-all-input file))
 
+(defn directory? [f]
+  ;;make sure it's not a string no .isDirectory on strings
+  (and (instance? java.io.File f)
+       (.isDirectory f)))
+
+
 ;;loads from all the files that match the pattern
 (defn load-rules-from-classpath [pattern]
   ;;(mapcat read-all-input
   (mapcat all-input
-          (remove (fn [f] (.isDirectory f))
+          (remove directory?
                   (classpath-matching pattern))))
 
   
