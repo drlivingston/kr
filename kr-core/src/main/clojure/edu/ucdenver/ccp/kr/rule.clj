@@ -32,6 +32,8 @@
 
 (def ^:dynamic *default-ok-ns* #{"_" "?"})
 
+(def ^:dynamic *print-bad-rules* true)
+
 ;;; --------------------------------------------------------
 ;;; helpers
 ;;; --------------------------------------------------------
@@ -48,6 +50,11 @@
   ;;make sure it's not a string no .isDirectory on strings
   (and (instance? java.io.File f)
        (.isDirectory f)))
+
+(defn load-rules-from-directory [dir]
+  (mapcat all-input
+          (remove directory?
+                  (directory-seq dir))))
 
 
 ;;loads from all the files that match the pattern
@@ -112,10 +119,11 @@
 (defn bad-rules [test rules]
   (let [bad (remove test rules)] ; remove if you pass the test
     ;;print bad rules and meta data - TODO: this should go to logging
-    (doseq [rule bad]
-      (println "rule failed test " (str test))
-      (pprint (meta rule))
-      (pprint rule))
+    (when *print-bad-rules*
+      (doseq [rule bad]
+        (println "rule failed test " (str test))
+        (pprint (meta rule))
+        (pprint rule)))
     bad)) ; return the bad rules
 
 ;;; --------------------------------------------------------

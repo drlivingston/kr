@@ -86,11 +86,16 @@
 ;;    (when-let [children (seq (.listFiles dir))]
 ;;      (cons dir (mapcat directory-seq children)))))
 
-(defn directory-seq [dir]
-  (lazy-seq
-   (let [children (seq (.listFiles dir))]
-     (concat children (mapcat directory-seq children)))))
-
+(defn directory-seq
+  ([dir]
+     (lazy-seq
+      (let [children (seq (.listFiles (file dir)))]
+        (concat children (mapcat directory-seq children)))))
+  ([dir filter-re]
+     (remove (fn [f]
+               (not (re-find filter-re (str f))))
+             (directory-seq dir))))
+  
 
 
 (defn classpath-seq []
