@@ -10,7 +10,7 @@
   <parent>
     <groupId>edu.ucdenver.ccp</groupId>
     <artifactId>kr</artifactId>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.4.4</version>
   </parent>
 
   <artifactId>kr-core</artifactId>
