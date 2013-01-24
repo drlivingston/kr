@@ -283,9 +283,10 @@
 ;;; --------------------------------------------------------
 
 (defn anon? [s]
-  (or (not (namespace s))
-      ;;(= "_" (namespace s))))
-      (= *anon-ns-name* (namespace s))))
+  (and (symbol? s)
+       (or (not (namespace s))
+           ;;(= "_" (namespace s))))
+           (= *anon-ns-name* (namespace s)))))
 
 ;; this doesn't really test literal it tests non-symbol
 (defn literal? [x]
