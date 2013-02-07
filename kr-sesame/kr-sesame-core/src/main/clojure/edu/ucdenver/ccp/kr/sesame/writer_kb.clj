@@ -84,26 +84,33 @@
 ;;; "constructors"
 ;;; --------------------------------------------------------
     
-(defn new-writer [target]
-  (let [writer (Rio/createWriter RDFFormat/NTRIPLES
-                                 (output-stream target))]
+(defn new-writer [out-stream]
+  (let [writer (Rio/createWriter RDFFormat/NTRIPLES out-stream)]
+                                 ;(output-stream target))]
     (.startRDF writer) ;side effect function doesn't return itself
     writer))
 
 (defn open-sesame-writer [kb]
-  (copy-sesame-slots (assoc (SesameWriterKB. (:target kb)
-                                             (new-writer (:target kb)))
-                       :value-factory (:value-factory kb))
-                     kb)) 
+  (let [out (output-stream (:target kb))
+        writer (new-writer out)]
+    (copy-sesame-slots (assoc (SesameWriterKB. (:target kb) writer)
+                                               ;(new-writer (:target kb)))
+                         :output-stream out
+                         :value-factory (:value-factory kb))
+                       kb)))
 
 (defn close-sesame-writer [kb]
-  (if (:connection kb)
-    (.endRDF (:connection kb)))
+  (when (:connection kb)
+    (.endRDF (:connection kb))
+    (.close (:output-stream kb)))
   (copy-sesame-slots (assoc (SesameWriterKB. (:target kb)
                                              nil)
                        :value-factory (:value-factory kb))
                      kb))
 
+
+;;if the target is a zipped output stream it will happily write there
+;; e.g. pass in (GZIPOutputStream. (output-stream ...))
 (defn new-sesame-writer-kb [target]
   (initialize-ns-mappings
    (assoc (SesameWriterKB. target nil) ;(initial-ns-mappings) nil)
