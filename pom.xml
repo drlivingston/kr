@@ -14,15 +14,8 @@
     <clojure.version>1.4.0</clojure.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <!-- are these necessary there is ${project.version} -->
-    <!--<kr.version>1.3.0-SNAPSHOT</kr.version>
-    <kr.groupId>edu.ucdenver.ccp</kr.groupId>-->
-
-    <!-- latest versions works with latest jenasesame lib -->
-    <!--<ver.jena>2.6.4</ver.jena>
-    <ver.arq>2.8.7</ver.arq>-->
-    <ver.arq>2.9.0-incubating</ver.arq>
-    <ver.sesame>2.6.6</ver.sesame>
+    <ver.arq>2.10.1</ver.arq>
+    <ver.sesame>2.7.1</ver.sesame>
 
     <ver.log4j>1.2.17</ver.log4j>
     <ver.slf4j>1.6.5</ver.slf4j>
@@ -73,20 +66,6 @@
       <artifactId>clojure</artifactId>
       <version>${clojure.version}</version>
     </dependency>
-    <!-- these should go into dependency managment and then only 
-         brought in as needed -->
-<!-- is this really needed any more?
-    <dependency>
-      <groupId>org.clojure.contrib</groupId>
-      <artifactId>repl-utils</artifactId>
-      <version>1.3.0-alpha4</version>
-    </dependency>
--->
-    <!--<dependency>
-      <groupId>org.clojure.contrib</groupId>
-      <artifactId>stream-utils</artifactId>
-      <version>1.3.0-alpha4</version>
-    </dependency>-->
   </dependencies>
 
   <dependencyManagement>
@@ -97,13 +76,6 @@
       <artifactId>java.classpath</artifactId>
       <version>0.1.0</version>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>core.unify</artifactId>
-      <version>0.5.2</version>
-    </dependency>
-    -->
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
@@ -112,7 +84,6 @@
            sesame-runtime brings in everything under the sun
       <artifactId>sesame</artifactId> -->
       <version>${ver.sesame}</version>
-      <!--<type>pom</type>-->
       <type>jar</type>
     </dependency>
 
@@ -148,8 +119,6 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>${ver.log4j}</version>
-      <!--<version>1.2.12</version>-->
-      <!--<scope>compile</scope>-->
     </dependency>
     
     <!-- I guess OpenRDF needs the following two things
@@ -189,42 +158,10 @@
 
 
   <repositories>
-
     <repository>
       <id>clojars</id>
       <url>http://clojars.org/repo</url>
     </repository>
-
-    <!-- this is where OpenRDF / Sesame lives-->
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>aduna-releases</id>
-      <name>Aduna Open Source - Maven releases</name>
-      <url>http://repo.aduna-software.org/maven2/releases</url>
-    </repository>
-
-    <!-- this is where Jena lives-->
-    <repository>
-      <id>apache-repo-releases</id>
-      <url>https://repository.apache.org/content/repositories/releases/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-
-    <!-- jena also seems to need this for some jmx dependencies -->
-    <repository>
-      <id>repository.jboss.org-public</id>
-      <name>JBoss.org Maven repository</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public</url>
-    </repository>  
-
-
   </repositories>
 
   <build>

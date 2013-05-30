@@ -28,12 +28,10 @@
       <version>${project.version}</version>
     </dependency>
 
-
     <!--shouldn't we just be bringing in the slf4j interface? -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-       <version>${ver.slf4j}</version>
     </dependency>
 
     <dependency>
@@ -41,24 +39,6 @@
       <artifactId>jena-arq</artifactId>
     </dependency>
 
-
-
   </dependencies>
-
-  <repositories>
-    <!-- jena-repo-dev is where SNAPSHOTs and RCs are published -->  
-
-    <!-- is this repo now offline? -->
-    <repository>
-      <id>repo-jena-dev</id>
-      <name>Jena Maven - Development Repository</name>
-      <layout>default</layout>
-      <url>http://openjena.org/repo-dev</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-  </repositories>
 
 </project>

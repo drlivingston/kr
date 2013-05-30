@@ -24,33 +24,26 @@
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-runtime</artifactId>
-      <!--<type>pom</type>-->
       <type>jar</type>
     </dependency>
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-queryresultio</artifactId>
-      <!--<type>pom</type>-->
       <type>pom</type>
     </dependency>
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-queryresultio-sparqlxml</artifactId>
-      <!--<type>pom</type>-->
       <type>jar</type>
     </dependency>
-
 
     <dependency>
       <groupId>org.openrdf.sesame</groupId>
       <artifactId>sesame-queryresultio-binary</artifactId>
-      <!--<type>pom</type>-->
       <type>jar</type>
     </dependency>
-
-
 
     <!-- these are needed for test -->
     <dependency>
@@ -70,12 +63,10 @@
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <!--<scope>test</scope>-->
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <!--<scope>test</scope>-->
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -83,7 +74,5 @@
       <scope>test</scope>
     </dependency>
 
-
   </dependencies>
-
 </project>

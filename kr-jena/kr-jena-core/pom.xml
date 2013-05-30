@@ -18,7 +18,6 @@
 
   <dependencies>
 
-
     <!-- these are needed for test -->
     <dependency>
       <groupId>${project.groupId}</groupId>
