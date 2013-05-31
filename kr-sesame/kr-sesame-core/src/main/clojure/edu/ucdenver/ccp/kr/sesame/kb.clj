@@ -209,7 +209,8 @@
                                  password *password*}}]
   ;; (println "server" server  " name" repo-name)
   ;; (println "username" username  " password" password)
-  (let [repository (HTTPRepository. server repo-name)]
+  (let [repository (org.openrdf.repository.http.HTTPRepository. server
+                                                                repo-name)]
     (.setPreferredTupleQueryResultFormat repository
                                          TupleQueryResultFormat/SPARQL)
     (if (and username password)

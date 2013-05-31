@@ -72,6 +72,14 @@
 (defn query-names-with-email [kb]
   (query kb names-and-email-pattern))
 
+(defn visit-people [kb]
+  (query-visit kb
+               (fn [bindings]
+                 (let [name (get bindings '?/name)
+                       email (get bindings '?/email)]
+                   (println "emailing " name " at: " email)))
+               names-and-email-pattern))
+
 ;;; --------------------------------------------------------
 ;;; REPL trace:
 ;;; --------------------------------------------------------
@@ -98,6 +106,14 @@
 
 ;; user> (query-names-with-email my-kb)
 ;; ({?/name "Kevin Livingston", ?/email "<mailto:kevin@example.org>"} {?/name "Bob Livingston", ?/email "<mailto:bob@example.org>"})
+
+;; user> (visit-people my-kb)
+;; emailing  Kevin Livingston  at:  <mailto:kevin@example.org>
+;; emailing  Bob Livingston  at:  <mailto:bob@example.org>
+;; nil
+
+;; user> (use 'edu.ucdenver.ccp.kr.kb)
+;; user> (close my-kb)
 
 ;;; --------------------------------------------------------
 ;;; END

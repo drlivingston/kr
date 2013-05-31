@@ -41,6 +41,13 @@
 (defn ski-areas [kb]
   (query kb '((?/ski rdf/type dbpedia-owl/SkiArea))))
 
+(defn visit-ski-areas [kb]
+  (query-visit kb
+               (fn [bindings]
+                 (let [area (get bindings '?/ski)]
+                   (println "visiting " (name area))))
+               ski-pattern))
+
 ;;; --------------------------------------------------------
 ;;; REPL trace:
 ;;; --------------------------------------------------------
@@ -56,6 +63,17 @@
 
 ;; user> (take 10 (ski-areas a-kb))
 ;; ({?/ski dbpedia/Grouse_Mountain} {?/ski dbpedia/Killington_Ski_Resort} {?/ski dbpedia/Whakapapa_skifield} {?/ski dbpedia/Treble_Cone} {?/ski dbpedia/Invincible_Snowfields} {?/ski dbpedia/Thredbo,_New_South_Wales} {?/ski dbpedia/Tyrol_Basin} {?/ski dbpedia/Squaw_Valley_Ski_Resort} {?/ski dbpedia/Brighton_Ski_Resort} {?/ski dbpedia/Keystone_Resort})
+
+
+;; user> (visit-ski-areas a-kb)
+;; visiting  Breuil-Cervinia
+;; visiting  Snowbasin
+;; visiting  Charlotte_Pass,_New_South_Wales
+;; visiting  Ski_Dubai
+;; visiting  Mont-Sainte-Anne
+;; visiting  Sunshine_Village
+;; visiting  Madonna_di_Campiglio
+;; visiting  Reiteralm
 
 
 ;; user> (use 'edu.ucdenver.ccp.kr.kb)
