@@ -13,7 +13,7 @@
   (open
    (edu.ucdenver.ccp.kr.sesame.kb/new-sesame-server
     :server "http://dbpedia.org/sparql"
-    :repo "")))
+    :repo-name "")))
 
 
 (defn add-namespaces [kb]
