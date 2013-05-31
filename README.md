@@ -90,7 +90,7 @@ the core dependency is kr-core:
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-core</artifactId>
-  <version>1.4.5</version>
+  <version>1.4.7</version>
 </dependency>
 ```
 
@@ -99,15 +99,17 @@ but the core dependency is unnecessary if you are brining in either the sesame o
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-sesame-core</artifactId>
-  <version>1.4.5</version>
+  <version>1.4.7</version>
 </dependency>
 
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-jena-core</artifactId>
-  <version>1.4.5</version>
+  <version>1.4.7</version>
 </dependency>
 ```
+
+The development version is currently 1.4.8-SNAPSHOT.
 
 
 ## Acknowledgements
