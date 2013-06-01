@@ -111,8 +111,6 @@ but the core dependency is unnecessary if you are brining in either the sesame o
 </dependency>
 ```
 
-The development version is currently 1.4.8-SNAPSHOT.
-
 
 ## Acknowledgements
 open sourced by: <br />
