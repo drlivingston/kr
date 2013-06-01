@@ -4,6 +4,8 @@
 
 The KR library is for working with knowledge representations and knowledge bases.  Currently it facilitates use of RDF-based representations backed by triple-/quad- stores.  It provides a consistent clojure based way of interacting with its backing implementations, which currently include the Jena and Sesame APIs.
 
+update: see the note on [Sesame Versions]
+
 
 ## Basic Setup
 
@@ -124,3 +126,4 @@ primary developer: [Kevin Livingston][]
 [CCP Lab]: http://compbio.ucdenver.edu/Hunter_lab/CCP_website/index.html
 [University of Colorado Denver]: http://www.ucdenver.edu/
 [Kevin Livingston]: https://github.com/drlivingston
+[Sesame Versions]:https://github.com/drlivingston/kr/wiki/versions-and-sesame
