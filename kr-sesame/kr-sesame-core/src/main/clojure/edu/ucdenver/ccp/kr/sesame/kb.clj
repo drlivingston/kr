@@ -149,6 +149,16 @@
   (visit-pattern [kb visitor pattern options]
     (sesame-visit-pattern kb visitor pattern options))
 
+  (construct-pattern [kb create-pattern pattern]
+        (sesame-construct-pattern kb create-pattern pattern))
+  (construct-pattern [kb create-pattern pattern options]
+        (sesame-construct-pattern kb create-pattern pattern options))
+  (construct-visit-pattern [kb visitor create-pattern pattern]
+    (sesame-construct-visit-pattern kb visitor create-pattern pattern))
+  (construct-visit-pattern [kb visitor create-pattern pattern options]
+    (sesame-construct-visit-pattern kb visitor create-pattern pattern options))
+
+  
   (ask-sparql [kb query-string]
             (sesame-ask-sparql kb query-string))
   (query-sparql [kb query-string]
@@ -156,7 +166,14 @@
   (count-sparql [kb query-string]
     (sesame-count-sparql kb query-string))
   (visit-sparql [kb visitor query-string]
-    (sesame-visit-sparql kb visitor query-string)))
+    (sesame-visit-sparql kb visitor query-string))
+
+  (construct-sparql [kb sparql-string]
+        (sesame-construct-sparql kb sparql-string))
+  (construct-visit-sparql [kb visitor sparql-string]
+    (sesame-construct-visit-sparql kb visitor sparql-string))
+
+  )
 
 ;; TODO factor this out to a "connection" package
 

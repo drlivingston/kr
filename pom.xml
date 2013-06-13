@@ -32,8 +32,8 @@
 
   <modules>
     <module>kr-core</module>
-    <module>kr-jena</module>
     <module>kr-sesame</module>
+    <module>kr-jena</module>
     <module>kr-backend</module>
     <!--<module>kr-examples</module>-->
   </modules>

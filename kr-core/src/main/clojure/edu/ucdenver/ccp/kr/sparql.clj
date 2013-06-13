@@ -41,11 +41,20 @@
   (count-pattern [kb pattern] [kb pattern options])
   (visit-pattern [kb visitor pattern] [kb visitor pattern options])
 
-  (ask-sparql [kb query-string] "boolean asks a sparql query")
-  (query-sparql [kb query-string] "gets bindings for sparql query")
-  (count-sparql [kb query-string])
-  (visit-sparql [kb visitor query-string]
-    "calls visitor function on bindings for side effects"))
+  (construct-pattern [kb create-pattern pattern]
+                     [kb create-pattern pattern options]
+                     "gets bindings for pattern")
+  (construct-visit-pattern [kb visitor create-pattern pattern]
+                           [kb visitor create-pattern pattern options])
+
+  (ask-sparql [kb sparql-string] "boolean asks a sparql query")
+  (query-sparql [kb sparql-string] "gets bindings for sparql query")
+  (count-sparql [kb sparql-string])
+  (visit-sparql [kb visitor sparql-string]
+    "calls visitor function on bindings for side effects")
+  (construct-sparql [kb sparql-string])
+  (construct-visit-sparql [kb visitor sparql-string]))
+
 
 ;;; --------------------------------------------------------
 ;;; helpers
@@ -275,6 +284,28 @@
        "")
      )))
 
+
+(defn sparql-construct-query [create-pattern triple-pattern & [options]]
+  (let [;;vars (or (and options
+        ;;              (:select-vars options))
+        ;;         (variables triple-pattern))
+        non-vars (symbols-no-vars triple-pattern)
+        namespaces (distinct (map namespace non-vars))
+        prefixes (get-prefixes-from-namespaces namespaces)]
+    (str
+     (prefix-block prefixes)
+     "CONSTRUCT { "
+     (sparql-query-body create-pattern)
+     "}"
+     "\n"
+     "WHERE { "
+     (sparql-query-body triple-pattern)
+     "}"
+     (if *select-limit*
+       (str " LIMIT " *select-limit* " ")
+       "")
+     )))
+
 (defn unique-count-var-internal [var-names-to-avoid candidate-name]
   ;;note contains? only works on sets because of stupid design decisions
   (if (not (contains? var-names-to-avoid candidate-name))
@@ -347,6 +378,25 @@
 (def query-count count-query)
 
 
+(defn construct
+  ([create-pattern pattern]
+     (construct-pattern *kb* create-pattern pattern))
+  ([kb create-pattern pattern & [options]]
+     (binding [*kb* kb]
+       (construct-pattern *kb* create-pattern pattern options))))
+
+(defn construct-visit
+  ([visitor create-pattern pattern]
+     (construct-visit-pattern *kb* visitor create-pattern pattern))
+  ([kb visitor create-pattern pattern & [options]]
+     (binding [*kb* kb]
+       (construct-visit-pattern *kb*
+                                visitor
+                                create-pattern
+                                pattern
+                                options))))
+
+
 
 (defn sparql-ask
   ([sparql-string] (ask *kb* sparql-string))
@@ -377,6 +427,21 @@
   ([kb visitor sparql-string]
      (binding [*kb* kb]
        (visit-sparql kb visitor sparql-string))))
+
+
+(defn sparql-construct
+  ([sparql-string]
+     (construct-sparql *kb* sparql-string))
+  ([kb sparql-string]
+     (binding [*kb* kb]
+       (construct-sparql *kb* sparql-string))))
+
+(defn sparql-construct-visit
+  ([visitor sparql-string]
+     (construct-visit-sparql *kb* visitor sparql-string))
+  ([kb visitor sparql-string]
+     (binding [*kb* kb]
+       (construct-visit-sparql *kb* visitor sparql-string))))
 
 
 ;;; --------------------------------------------------------
