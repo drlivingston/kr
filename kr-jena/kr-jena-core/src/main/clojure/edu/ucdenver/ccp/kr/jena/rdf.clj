@@ -145,15 +145,17 @@
 ;;; creating clj data structures from Jena objects
 ;;; --------------------------------------------------------
 
+(defn uri-to-sym [kb r]
+  (let [ns (long-ns-to-short-ns kb (.getNameSpace r))]
+    (if ns
+      (symbol ns (.getLocalName r))
+      (convert-string-to-sym kb (str (.getNameSpace r) (.getLocalName r))))))
+
 (defn resource-to-sym [kb r]
   (if (.isAnon r)
     (symbol *anon-ns-name* (str (.getLabelString (.getId r))))
-    (let [ns (long-ns-to-short-ns kb (.getNameSpace r))]
-      (if ns
-        (symbol ns (.getLocalName r))
-        (convert-string-to-sym kb (str (.getNameSpace r) (.getLocalName r)))))))
-
-
+    (uri-to-sym kb r)))
+    
 (defn clj-ify-statement [kb s]
   (list (clj-ify kb (.getSubject s))
         (clj-ify kb (.getPredicate s))
@@ -162,6 +164,17 @@
 ;; statement pieces
 (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.ResourceImpl [kb r] 
   (resource-to-sym kb r))
+
+(defmethod clj-ify com.hp.hpl.jena.graph.Node_URI [kb r] 
+  (uri-to-sym kb r))
+
+(defmethod clj-ify com.hp.hpl.jena.graph.Node_Blank [kb b]
+  (symbol *anon-ns-name* (str (.getLabelString (.getBlankNodeId b)))))
+
+(defmethod clj-ify com.hp.hpl.jena.graph.Node_Literal [kb l] 
+  (.getLiteralValue l))
+
+
 ;; Properties are resources - nothing to do special
 ;;   unless meta data is of interest
 ;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.PropertyImpl [p]
@@ -172,6 +185,10 @@
 ;; statements
 (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.StatementImpl [kb s] 
   (clj-ify-statement kb s))
+
+(defmethod clj-ify com.hp.hpl.jena.graph.Triple [kb s] 
+  (clj-ify-statement kb s))
+
 
 ;; collections of clj-ifiable things
 (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.StmtIteratorImpl [kb s]

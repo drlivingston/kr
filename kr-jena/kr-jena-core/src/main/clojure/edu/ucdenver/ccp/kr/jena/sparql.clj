@@ -43,8 +43,8 @@
 ;; (defmethod clj-ify org.openrdf.query.TupleQueryResult [results]
 ;;   (result-map (jena-iteration-seq results)))
 
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
-  (.getValue l))
+;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
+;;   (.getValue l))
 
 
 ;;; --------------------------------------------------------
@@ -98,6 +98,29 @@
      (finally (.close qexec)))))
 
 
+
+
+(defn jena-construct-sparql [kb sparql-string]
+  (let [qexec (jena-query-setup kb sparql-string)]
+    (try
+      (doall (clj-ify kb (iterator-seq (.execConstructTriples qexec))))
+       ;; (map (partial clj-ify kb)
+       ;;           (iterator-seq (.execConstructTriples qexec))))
+     (finally (.close qexec)))))
+
+(defn jena-construct-visit-sparql [kb visitor sparql-string]
+  (let [qexec (jena-query-setup kb sparql-string)]
+    (try
+      (dorun (map (fn [triple]
+                    (visitor (clj-ify kb triple)))
+                 (iterator-seq (.execConstructTriples qexec))))
+     (finally (.close qexec)))))
+
+
+
+
+
+
 ;;this returns a boolean
 (defn jena-ask-pattern [kb pattern & [options]]
   (jena-ask-sparql kb (sparql-ask-query pattern options)))
@@ -125,6 +148,21 @@
 
 (defn jena-visit-pattern [kb visitor pattern & [options]]
   (jena-visit-sparql kb visitor (sparql-select-query pattern options)))
+
+(defn jena-construct-pattern [kb create-pattern pattern & [options]]
+  (jena-construct-sparql kb
+                         (sparql-construct-query create-pattern
+                                                 pattern
+                                                 options)))
+
+(defn jena-construct-visit-pattern [kb visitor create-pattern pattern
+                                      & [options]]
+  (jena-construct-visit-sparql kb
+                               visitor
+                               (sparql-construct-query create-pattern
+                                                       pattern
+                                                       options)))
+
 
 
 ;;; --------------------------------------------------------

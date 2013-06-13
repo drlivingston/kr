@@ -124,16 +124,35 @@
   (visit-pattern [kb visitor pattern]
         (jena-visit-pattern kb visitor pattern))
   (visit-pattern [kb visitor pattern options]
-        (jena-visit-pattern kb visitor pattern options))
+    (jena-visit-pattern kb visitor pattern options))
+
+  (construct-pattern [kb create-pattern pattern]
+        (jena-construct-pattern kb create-pattern pattern))
+  (construct-pattern [kb create-pattern pattern options]
+        (jena-construct-pattern kb create-pattern pattern options))
+  (construct-visit-pattern [kb visitor create-pattern pattern]
+    (jena-construct-visit-pattern kb visitor create-pattern pattern))
+  (construct-visit-pattern [kb visitor create-pattern pattern options]
+    (jena-construct-visit-pattern kb visitor create-pattern pattern options))
+  
 
   (ask-sparql [kb query-string]
-            (jena-ask-sparql kb query-string))
+    (jena-ask-sparql kb query-string))
   (query-sparql [kb query-string]
-        (jena-query-sparql kb query-string))
+    (jena-query-sparql kb query-string))
   (count-sparql [kb query-string]
-        (jena-count-sparql kb query-string))
+    (jena-count-sparql kb query-string))
   (visit-sparql [kb visitor query-string]
-        (jena-visit-sparql kb visitor query-string)))
+    (jena-visit-sparql kb visitor query-string))
+
+  (construct-sparql [kb sparql-string]
+    (jena-construct-sparql kb sparql-string))
+  (construct-visit-sparql [kb visitor sparql-string]
+    (jena-construct-visit-sparql kb visitor sparql-string))
+
+
+
+  )
 
 ;;models:
 
