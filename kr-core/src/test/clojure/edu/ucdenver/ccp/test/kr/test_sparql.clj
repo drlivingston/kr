@@ -245,6 +245,42 @@
 
 
 
+(kb-test test-backquote-operators test-triples-numbers-equality
+      (is (= 2 ;two because of reflection
+             (count (query `((?/person foaf/surname ?/name)
+                             (?/person foaf/age ?/age1)
+                             (?/person2 foaf/surname ?/name)
+                             (?/person2 foaf/age ?/age2)
+                             (= ?/age1 ?/age2)
+                             (!= ?/person ?/person2)
+                             )))))
+      (is (= 2 
+             (count (query `((?/person foaf/surname ?/name)
+                             (?/person foaf/age ?/age1)
+                             (?/person2 foaf/surname ?/name)
+                             (?/person2 foaf/age ?/age2)
+                             (> ?/age1 ?/age2)
+                             ))))))
+
+
+(kb-test test-strings-in-operators test-triples-6-3
+      (is (= 2
+             (count (query `((?/person foaf/name ?/name))))))
+      (is (= 1
+             (count (query `((?/person foaf/name ?/name)
+                             (= "Bob" ?/name))))))
+      ;; box to drop the language tag since none given
+      (is (= 0
+             (count (query `((?/person foaf/name ?/name)
+                             (= ["Bob"] ?/name)))))))
+
+(kb-test test-regex-operator test-triples-6-3
+      (is (= 2
+             (count (query `((?/person foaf/name ?/name))))))
+      (is (= 1
+             (count (query `((?/person foaf/name ?/name)
+                             (:regex ?/name "^ali" "i")))))))
+
 ;;; --------------------------------------------------------
 ;;; END
 ;;; --------------------------------------------------------

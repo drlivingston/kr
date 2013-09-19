@@ -172,12 +172,27 @@
 (defn not-operator [args]
   (str "!" (operator-body (first args))))
 
-(defn regex-operator [args]
-  (str " regex(" (operator-body(first args))
-       ", " (operator-body(second args))
-       (if (first (rest (rest args)))
-         (str ", " (operator-body (first (rest (rest args)))) ")")
+
+;; if the arg is a raw string box it, otherwise leave it alone
+(defn safe-box-raw-string [arg]
+  (if (string? arg)
+    (vector arg)
+    arg))
+
+;;these might be raw strings if so they shouldn't auto-acquire lang tags
+;;  this may be true of other operators too?
+(defn regex-operator [[text pattern flags :as args]]
+  (str " regex(" (operator-body (safe-box-raw-string text))
+       ", " (operator-body (safe-box-raw-string pattern))
+       (if flags
+         (str ", " (operator-body (safe-box-raw-string flags)) ")")
          ") ")))
+;; (defn regex-operator [args]
+;;   (str " regex(" (operator-body(first args))
+;;        ", " (operator-body(second args))
+;;        (if (first (rest (rest args)))
+;;          (str ", " (operator-body (first (rest (rest args)))) ")")
+;;          ") ")))
 
 (def sparql-operators
      {:bound (unary-operator "bound")
@@ -198,35 +213,71 @@
       :and (n-ary-operator "&&")
       :not not-operator
       ;; not these:
-      '|| (n-ary-operator "||")
-      '&& (n-ary-operator "&&")
-      '! not-operator
+      "||" (n-ary-operator "||")
+      "&&" (n-ary-operator "&&")
+      "!" not-operator
 
-      '= (binary-operator "=")
-      '!= (binary-operator "!=")
-      '< (binary-operator "<")
-      '> (binary-operator ">")
-      '<= (binary-operator "<=")
-      '>= (binary-operator ">=")
-      '* (binary-operator "*")
-      '/ (binary-operator "/")
-      '+ (binary-operator "+")
-      '- (binary-operator "-")
+      "=" (binary-operator "=")
+      "!=" (binary-operator "!=")
+      "<" (binary-operator "<")
+      ">" (binary-operator ">")
+      "<=" (binary-operator "<=")
+      ">=" (binary-operator ">=")
+      "*" (binary-operator "*")
+      "/" (binary-operator "/")
+      "+" (binary-operator "+")
+      "-" (binary-operator "-")
+
+
+      ;; '|| (n-ary-operator "||")
+      ;; '&& (n-ary-operator "&&")
+      ;; '! not-operator
+
+      ;; '= (binary-operator "=")
+      ;; '!= (binary-operator "!=")
+      ;; '< (binary-operator "<")
+      ;; '> (binary-operator ">")
+      ;; '<= (binary-operator "<=")
+      ;; '>= (binary-operator ">=")
+      ;; '* (binary-operator "*")
+      ;; '/ (binary-operator "/")
+      ;; '+ (binary-operator "+")
+      ;; '- (binary-operator "-")
+
+
+      ;; 'clojure.core/= (binary-operator "=")
+      ;; 'clojure.core/!= (binary-operator "!=")
+      ;; 'clojure.core/< (binary-operator "<")
+      ;; 'clojure.core/> (binary-operator ">")
+      ;; 'clojure.core/<= (binary-operator "<=")
+      ;; 'clojure.core/>= (binary-operator ">=")
+      ;; 'clojure.core/* (binary-operator "*")
+      ;; 'clojure.core// (binary-operator "/")
+      ;; 'clojure.core/+ (binary-operator "+")
+      ;; 'clojure.core/- (binary-operator "-")
 
       :sameTerm (binary-prefix-operator "sameTerm")
       :langMatches (binary-prefix-operator "langMatches")
 
       :regex regex-operator})
-      
-(defn sparql-operator? [op]
-  (get sparql-operators op))
 
+
+(defn sparql-operator [op]
+  (let [op-key (if (keyword? op)
+                 op
+                 (name op))]
+    (get sparql-operators op-key)))
+
+(defn sparql-operator? [op]
+  (sparql-operator op))
+  
 (defn operator-body [operator-expression]
   ;;(if (not (seq? operator-expression))
   (if (not (sequential? operator-expression))
     ;;(str operator-expression)
     (item-to-sparql operator-expression)
-    (let [op (get sparql-operators (first operator-expression))]
+    ;;(let [op (get sparql-operators (first operator-expression))]
+    (let [op (sparql-operator (first operator-expression))]
       (if op
         (op (rest operator-expression))
         (item-to-sparql operator-expression)))))

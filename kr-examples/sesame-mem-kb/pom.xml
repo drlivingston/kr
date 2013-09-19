@@ -4,7 +4,7 @@
 
   <groupId>edu.ucdenver.ccp.kr.examples</groupId>
   <artifactId>sesame-mem-kb</artifactId>
-  <version>1.4.9-SNAPSHOT</version>
+  <version>1.4.10-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>edu.ucdenver.ccp</groupId>
       <artifactId>kr-sesame-core</artifactId>
-      <version>1.4.9-SNAPSHOT</version>
+      <version>1.4.10-SNAPSHOT</version>
     </dependency>
 
     <dependency>
