@@ -16,8 +16,8 @@
 
     <ver.arq>2.10.1</ver.arq>
     <!--<ver.sesame>2.7.1</ver.sesame>-->
-    <!--<ver.sesame>2.6.10</ver.sesame>-->
-    <ver.sesame>2.6.8</ver.sesame>
+    <ver.sesame>2.6.10</ver.sesame>
+    <!--<ver.sesame>2.6.8</ver.sesame>-->
 
     <ver.log4j>1.2.17</ver.log4j>
     <ver.slf4j>1.6.5</ver.slf4j>

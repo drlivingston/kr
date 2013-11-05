@@ -99,8 +99,78 @@
         *use-default-language*
         *string-literal-language*) (sparql-str-lang s *string-literal-language*)
    ;;plain literal including plain string 
-   :else (pr-str s)))
-  
+        :else (pr-str s)))
+
+
+;; :inverse
+;; :or
+;; default is just a sequence as with /
+;; if vector modifiers are * + ?
+;; or numbers if one number exact if two range
+;; allow nils for range to allow for min and max
+
+;; so [rdfs/subClassOf *] becomes expanded to full URI rdfs:subClassOf*
+
+;; this needs to call recursively
+
+(declare property-path)
+
+;; this will handle * + ?
+(defn symbol-path-element [[internal-path-part symbol]]
+  (str (property-path internal-path-part)
+       (name symbol)))
+
+(defn number-path-element [[internal-path-part min-count max-count
+                            :as path-element]]
+  (str (property-path internal-path-part)
+       "{"
+       (cond
+        (= 2 (count path-element)) (str min-count)
+        (nil? min-count) (str "," (str max-count))
+        (nil? max-count) (str (str min-count) ",")
+        :else (str (str min-count) "," (str max-count)))
+       "}"))       
+
+(defn vector-path-element [element]
+  (if (nil? (rest element))
+    (property-path (first element))
+    (let [[property modifer-or-count count] element]
+      (if (symbol? modifer-or-count)
+        (symbol-path-element element)
+        (number-path-element element)))))
+
+(defn inverse-property-path [internal-path-part]
+  (str "^" (property-path internal-path-part)))
+
+(defn alternative-property-path [path-parts]
+  (str "( "
+       (apply str (interpose " | "
+                             (map property-path path-parts)))
+       " )"))
+
+(defn sequential-property-path [path-parts]
+  (str "( "
+       (apply str (interpose " / "
+                             (map property-path path-parts)))
+       " )"))
+
+(defn list-property-path [p]
+  (let [potential-operator (first p)]
+    (cond
+     (= :or potential-operator)      (alternative-property-path (rest p))
+     (= :inverse potential-operator) (inverse-property-path     (rest p))
+     :else                           (sequential-property-path  p))))
+
+(defn property-path [path]
+  (cond
+   (symbol? path) (sym-to-sparql path)
+   (vector? path) (vector-path-element path)
+   (sequential? path) (list-property-path path)
+   
+   ;;plain literal including plain string 
+   :else (pr-str path)))
+
+(def property-position-to-sparql property-path)
 
 
 ;;; --------------------------------------------------------
@@ -122,7 +192,12 @@
                           prefixes))))
 
 (defn sparql-statement [statement]
-  (let [[s p o g] (map item-to-sparql statement)]
+  ;;(let [[s p o g] (map item-to-sparql statement)]
+  (let [[s-part p-part o-part g-part] statement
+        s (item-to-sparql s-part)
+        p (property-position-to-sparql p-part)
+        o (item-to-sparql o-part)
+        g (and g-part (item-to-sparql g-part))]
     (str (if g
            (str " GRAPH " g " { ")
            "")
