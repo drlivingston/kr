@@ -116,7 +116,7 @@
 ;; (defmulti reify-rule-form-fn (fn [[var {type :type :as reify-opts}]]
 ;;                                type))
 (defmulti reify-rule-form-fn
-  (fn [reify-form]
+  (fn [rule reify-form]
     (cond 
      (not (sequential? reify-form)) :default
      (not (map? (second reify-form))) :default ;is this actually an error?
@@ -124,36 +124,40 @@
      :else (first (:ln (second reify-form))))))
 
 
-(defmethod reify-rule-form-fn :default [[var reify-opts]]
+(defmethod reify-rule-form-fn :default [rule [var reify-opts]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
       (reify-unique))))
 
-(defmethod reify-rule-form-fn :unique [[var reify-opts]]
+(defmethod reify-rule-form-fn :unique [rule [var reify-opts]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
       (reify-unique))))
   
-(defmethod reify-rule-form-fn :localname [[var {[fn-name & params] :ln
+(defmethod reify-rule-form-fn :localname [rule
+                                          [var {[fn-name & params] :ln
                                                 :as reify-opts}]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
       (apply reify-localname (map bindings params)))))
 
-(defmethod reify-rule-form-fn :md5 [[var {[fn-name & params] :ln
+(defmethod reify-rule-form-fn :md5 [rule
+                                    [var {[fn-name & params] :ln
                                           :as reify-opts}]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
       (apply reify-md5 (map bindings params)))))
 
-(defmethod reify-rule-form-fn :regex [[var {[fn-name match replace & vars] :ln
+(defmethod reify-rule-form-fn :regex [rule
+                                      [var {[fn-name match replace & vars] :ln
                                             :as reify-opts}]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
       (apply reify-regex match replace (map bindings vars)))))
 
 
-(defmethod reify-rule-form-fn :fn [[var {[fn-name fcn] :ln
+(defmethod reify-rule-form-fn :fn [rule
+                                   [var {[fn-name fcn] :ln
                                          :as reify-opts}]]
   (fn [bindings]
     (with-reify-name-bindings reify-opts
@@ -176,7 +180,7 @@
                ;; (pprint form)
                [var (assoc opts
                       :reify-fn
-                      (reify-rule-form-fn form))])
+                      (reify-rule-form-fn rule form))])
                (vector entry {:reify-fn (default-reify-rule-form-fn)})))
            reify)))
 
