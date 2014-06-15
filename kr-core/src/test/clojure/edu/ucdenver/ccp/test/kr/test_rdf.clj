@@ -11,6 +11,7 @@
        edu.ucdenver.ccp.kr.sparql
        )
   (import ;java.io.InputStream
+          java.net.URI
           java.io.ByteArrayInputStream)
   )
 
@@ -25,6 +26,11 @@
           "<http://www.example.org/a> "
           "<http://www.example.org/p> "
           "<http://www.example.org/y> . \n"))
+
+(def uri-a (URI. "http://www.example.org/a"))
+(def uri-p (URI. "http://www.example.org/p"))
+(def uri-x (URI. "http://www.example.org/x"))
+
 ;;; --------------------------------------------------------
 ;;; tests
 ;;; --------------------------------------------------------
@@ -91,6 +97,17 @@
                              (ex/BobL foaf/mbox "<mailto:bob@example.org>")))))
 
 
+(kb-test test-one-triple-uri1 nil
+         (is (nil? (add! *kb* uri-a 'ex/b 'ex/c)))
+         (is (ask-rdf *kb* 'ex/a 'ex/b 'ex/c))
+         (is (ask-rdf *kb* uri-a 'ex/b 'ex/c)))
+
+(kb-test test-one-triple-uri2 nil
+         (is (nil? (add! *kb* uri-a uri-p uri-x)))
+         (is (ask-rdf *kb* 'ex/a 'ex/p 'ex/x))
+         (is (ask-rdf *kb* uri-a uri-p uri-x)))
+
+
 (kb-test test-one-triple nil
          (is (nil? (add! *kb* 'ex/a 'ex/b 'ex/c)))
          (is (ask-rdf *kb* 'ex/a 'ex/b 'ex/c)))
@@ -148,6 +165,21 @@
          (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* 'ex/a 'ex/b nil nil)))
          (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* nil 'ex/b nil nil)))
          (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* 'ex/a 'ex/b 'ex/c nil))))
+
+
+(kb-test test-query-triple-uri nil
+         (is (nil? (add *kb* uri-a 'ex/b 'ex/c)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* uri-a nil nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* uri-a 'ex/b nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* nil 'ex/b nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* uri-a 'ex/b 'ex/c)))
+
+         ;;quads
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* 'ex/a nil nil nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* 'ex/a 'ex/b nil nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* nil 'ex/b nil nil)))
+         (is (= '((ex/a ex/b ex/c)) (query-rdf *kb* 'ex/a 'ex/b 'ex/c nil))))
+
 
 (kb-test test-query-graph nil
          (is (nil? (add *kb* 'ex/a 'ex/b 'ex/c 'ex/x)))

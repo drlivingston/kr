@@ -3,7 +3,8 @@
        edu.ucdenver.ccp.kr.rdf
        edu.ucdenver.ccp.kr.variable
        edu.ucdenver.ccp.kr.unify)
-  (import java.util.Map)) ;is this actaully used?
+  (import java.util.Map ;is this actaully used?
+          java.net.URI))
 
 ;;; --------------------------------------------------------
 ;;; constants and variables
@@ -62,6 +63,9 @@
 
 ;; shouldn't these be calling the RDF based ones?
 
+(defn sparql-uri [s]
+   (str "<" s ">"))
+
 (defn find-mapping-from-short [short]
   (or (find *ns-map-to-long* short)
       (find (and *kb* (ns-map-to-long *kb*)) short)))
@@ -70,10 +74,29 @@
   (cond
    (variable? s) (str "?" (name s))
    (anon? s) (str "_:" (name s))
-   :else (str "<" (sym-to-long-name s) ">")))
+   :else (sparql-uri (sym-to-long-name s))))
+;;:else (str "<" (sym-to-long-name s) ">")))
 
 (defn sparql-str-lang [s l]
   (str (pr-str s) "@" l))
+
+
+
+(defn sparql-ify-uri [uri]
+  (sparql-uri (.toString uri)))
+
+;;(defmulti sparql-ify type)
+(defmulti sparql-ify (fn [thing] (type thing)))
+
+;;(defmethod sparql-ify clojure.lang.Symbol [s] (sparql-ify-sym kb s))
+
+(defmethod sparql-ify java.net.URI [s] (sparql-ify-uri s))
+
+(defmethod sparql-ify String [s] (pr-str s))
+(defmethod sparql-ify :default [s] (pr-str s))
+
+
+
 
 ;; it's possible this could be done faster with a call to rdf/object
 ;;   and then re-serializing that
@@ -82,7 +105,8 @@
    ;; symbol
    (symbol? s) (sym-to-sparql s)
    ;; no inference allowd
-   (not *infer-literal-type*) (pr-str s)
+   ;;(not *infer-literal-type*) (pr-str s)
+   (not *infer-literal-type*) (sparql-ify s)
    ;; boxed
    (sequential? s) (let [[x type] s]
                      (cond
@@ -99,7 +123,8 @@
         *use-default-language*
         *string-literal-language*) (sparql-str-lang s *string-literal-language*)
    ;;plain literal including plain string 
-        :else (pr-str s)))
+        ;;:else (pr-str s)))
+        :else (sparql-ify s)))
 
 
 ;; :inverse
@@ -168,7 +193,8 @@
    (sequential? path) (list-property-path path)
    
    ;;plain literal including plain string 
-   :else (pr-str path)))
+   :else (item-to-sparql path)))
+;;:else (pr-str path)))
 
 (def property-position-to-sparql property-path)
 
@@ -337,10 +363,17 @@
       :regex regex-operator})
 
 
+;; (defn sparql-operator [op]
+;;   (let [op-key (if (keyword? op)
+;;                  op
+;;                  (name op))]
+;;     (get sparql-operators op-key)))
+
 (defn sparql-operator [op]
-  (let [op-key (if (keyword? op)
-                 op
-                 (name op))]
+  (let [op-key (cond (keyword? op) op
+                     (symbol? op) (name op)
+                     :else (.toString op))] ;should strings be allowed?
+    ;;(name op))]
     (get sparql-operators op-key)))
 
 (defn sparql-operator? [op]

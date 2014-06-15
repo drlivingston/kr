@@ -320,11 +320,17 @@
     (blank-node kb (name s))  ;(anon-str-to-id-str (name s)))
     (sym-to-long-name kb s)))
 
+(defn resource-ify-uri [kb uri]
+  (.toString uri))
+
 
 ;;(defmulti resource-ify type)
 (defmulti resource-ify (fn [kb thing] (type thing)))
 
 (defmethod resource-ify clojure.lang.Symbol [kb s] (resource-ify-sym kb s))
+
+(defmethod resource-ify java.net.URI [kb s] (resource-ify-uri kb s))
+
 (defmethod resource-ify String [_ s] s)
 (defmethod resource-ify :default [_ s] (str s))
 
@@ -395,9 +401,16 @@
 
 (defn object 
   ([x] (object *kb* x))
-  ([kb x] (if (= (type x) clojure.lang.Symbol)
-           (resource kb x)
-           (literal kb x))))
+  ([kb x] (if (or (= (type x) clojure.lang.Symbol)
+                  (= (type x) java.net.URI))
+            (resource kb x)
+            (literal kb x))))
+
+;; (defn object 
+;;   ([x] (object *kb* x))
+;;   ([kb x] (if (= (type x) clojure.lang.Symbol)
+;;            (resource kb x)
+;;            (literal kb x))))
 
 
 ;;; creating properties from clj data

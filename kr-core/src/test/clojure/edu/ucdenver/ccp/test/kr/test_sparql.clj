@@ -7,11 +7,28 @@
        edu.ucdenver.ccp.kr.variable
        edu.ucdenver.ccp.kr.kb
        edu.ucdenver.ccp.kr.rdf
-       edu.ucdenver.ccp.kr.sparql))
+       edu.ucdenver.ccp.kr.sparql)
+  (import java.net.URI))
 
 ;;; --------------------------------------------------------
 ;;; constansts
 ;;; --------------------------------------------------------
+
+(def uri-a (URI. "http://www.example.org/a"))
+(def uri-p (URI. "http://www.example.org/p"))
+(def uri-b (URI. "http://www.example.org/b"))
+(def uri-x (URI. "http://www.example.org/x"))
+
+
+(def test-triples-uri
+     '((ex/a  rdf/type        foaf/Person )
+       (ex/a  foaf/name       "Alice" )
+       (ex/a  foaf/mbox       "<mailto:alice@example.com>" )
+       (ex/a  foaf/mbox       "<mailto:alice@work.example>" )
+       (ex/a  foaf/knows      ex/b)
+       (ex/b  rdf/type        foaf/Person )
+       (ex/b  foaf/name       "Bob" )))
+
 
 (def test-triples-6-1
      '((ex/a  rdf/type        foaf/Person )
@@ -280,6 +297,24 @@
       (is (= 1
              (count (query `((?/person foaf/name ?/name)
                              (:regex ?/name "^ali" "i")))))))
+
+
+(kb-test test-uri-pat  test-triples-uri
+      (is (= 1
+             (count (query '((?/person1 foaf/knows ?/person2))))))
+      (is (= 1
+             (count (query '((ex/a foaf/knows ?/person2))))))
+      (is (= 1
+             (count (query '((?/person1 foaf/knows ex/b))))))
+      (is (= 0
+             (count (query '((ex/b foaf/knows ?/person2))))))
+      (is (= 1
+             (count (query `((?/person1 foaf/knows ~uri-b))))))
+      (is (= 1
+             (count (query `((~uri-a foaf/knows ?/person2))))))
+      (is (ask `((~uri-a foaf/knows ~uri-b))))
+      )
+
 
 ;;; --------------------------------------------------------
 ;;; END
