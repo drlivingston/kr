@@ -189,43 +189,25 @@
 
 
 (defn reification-dependencies [reify-list]
-  (let [results
   (mapcat (fn [[v {deps :dependencies}]]
             (concat `((~v ~nil))
                     (map (partial list v) deps)))
-          reify-list)
-        ]
-    (pprint results)
-    results))
-
+          reify-list))
 
 (defn sort-reification-based-on-dependencies [reify-list]
-  (pprint "reify-list") (pprint reify-list)
   (let [original-map (reduce (fn [m [v options]]
                                (assoc m v options))
                              {}
                              reify-list)]
-    (pprint "original-map") (pprint original-map)
-
-    (let [results
-    ;; the below will return many things not in the reify block
     (remove (fn [[var reify-def]]
               (nil? reify-def))
-    (map (fn [var]
-           (vector var (original-map var))) ;;orig-val)
-           ;; (let [orig-val (original-map var)]
-           ;;   (if orig-val
-
-           ;;     orig-val)))
-         (dep/topo-sort
-          (reduce (fn [graph [var dependency]]
-                    (dep/depend graph var dependency))
-                  (dep/graph)
-                  (reification-dependencies reify-list)))))
-          ]
-      (pprint results)
-      results)
-      ))
+            (map (fn [var]
+                   (vector var (original-map var)))
+                 (dep/topo-sort
+                  (reduce (fn [graph [var dependency]]
+                            (dep/depend graph var dependency))
+                          (dep/graph)
+                          (reification-dependencies reify-list)))))))
 
 
 (defn add-reify-fns [{reify :reify :as rule}]
