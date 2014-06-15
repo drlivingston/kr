@@ -11,7 +11,8 @@
        edu.ucdenver.ccp.kr.rule
        [clojure.java.io :exclude (resource)]
        clojure.set
-       clojure.pprint))
+       clojure.pprint)
+  (require [com.stuartsierra.dependency :as dep]))
 ;;  (import java.io.PushbackReader))
        
 ;;; --------------------------------------------------------
@@ -124,65 +125,134 @@
      :else (first (:ln (second reify-form))))))
 
 
+(defn extend-reify-map [reify-opts fn & [dependency-vars]]
+  (assoc reify-opts
+    :reify-fn fn
+    :dependencies dependency-vars))
+
 (defmethod reify-rule-form-fn :default [rule [var reify-opts]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (reify-unique))))
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (reify-unique)))))
 
 (defmethod reify-rule-form-fn :unique [rule [var reify-opts]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (reify-unique))))
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (reify-unique)))))
   
 (defmethod reify-rule-form-fn :localname [rule
                                           [var {[fn-name & params] :ln
                                                 :as reify-opts}]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (apply reify-localname (map bindings params)))))
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (apply reify-localname (map bindings params))))
+                    (variables params)))
 
 (defmethod reify-rule-form-fn :md5 [rule
                                     [var {[fn-name & params] :ln
                                           :as reify-opts}]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (apply reify-md5 (map bindings params)))))
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (apply reify-md5 (map bindings params))))
+                    (variables params)))
 
 (defmethod reify-rule-form-fn :regex [rule
                                       [var {[fn-name match replace & vars] :ln
                                             :as reify-opts}]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (apply reify-regex match replace (map bindings vars)))))
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (apply reify-regex match replace (map bindings vars))))
+                    (variables vars)))
 
 
 (defmethod reify-rule-form-fn :fn [rule
                                    [var {[fn-name fcn] :ln
                                          :as reify-opts}]]
-  (fn [bindings]
-    (with-reify-name-bindings reify-opts
-      (reify-sym (fcn bindings))))) ;params is a function in this case
+  (extend-reify-map reify-opts
+                    (fn [bindings]
+                      (with-reify-name-bindings reify-opts
+                        (reify-sym (fcn bindings))))))
+;; ideally these should be rigged to go last
+;; just move them last after?
+;; pull them all off and put them on at the end
 
 
 (defn default-reify-rule-form-fn []
-  (fn [bindings]
-    (reify-unique)))
+  (extend-reify-map {}
+                    (fn [bindings]
+                      (reify-unique))))
+
+
+(defn reification-dependencies [reify-list]
+  (let [results
+  (mapcat (fn [[v {deps :dependencies}]]
+            (concat `((~v ~nil))
+                    (map (partial list v) deps)))
+          reify-list)
+        ]
+    (pprint results)
+    results))
+
+
+(defn sort-reification-based-on-dependencies [reify-list]
+  (pprint "reify-list") (pprint reify-list)
+  (let [original-map (reduce (fn [m [v options]]
+                               (assoc m v options))
+                             {}
+                             reify-list)]
+    (pprint "original-map") (pprint original-map)
+
+    (let [results
+    ;; the below will return many things not in the reify block
+    (remove (fn [[var reify-def]]
+              (nil? reify-def))
+    (map (fn [var]
+           (vector var (original-map var))) ;;orig-val)
+           ;; (let [orig-val (original-map var)]
+           ;;   (if orig-val
+
+           ;;     orig-val)))
+         (dep/topo-sort
+          (reduce (fn [graph [var dependency]]
+                    (dep/depend graph var dependency))
+                  (dep/graph)
+                  (reification-dependencies reify-list)))))
+          ]
+      (pprint results)
+      results)
+      ))
 
 
 (defn add-reify-fns [{reify :reify :as rule}]
   (assoc rule
     :reify
-    (map (fn [entry]
-           (if (sequential? entry)
-             (let [[var opts :as form] entry]
-               ;; (pprint var)
-               ;; (pprint opts)
-               ;; (pprint form)
-               [var (assoc opts
-                      :reify-fn
-                      (reify-rule-form-fn rule form))])
-               (vector entry {:reify-fn (default-reify-rule-form-fn)})))
-           reify)))
+    (sort-reification-based-on-dependencies
+     (map (fn [entry]
+            (if (sequential? entry)
+              (let [[var opts :as form] entry]
+                [var (reify-rule-form-fn rule form)])
+              (vector entry (default-reify-rule-form-fn))))
+          reify))))
+
+;; (defn add-reify-fns [{reify :reify :as rule}]
+;;   (assoc rule
+;;     :reify
+;;     (map (fn [entry]
+;;            (if (sequential? entry)
+;;              (let [[var opts :as form] entry]
+;;                ;; (pprint var)
+;;                ;; (pprint opts)
+;;                ;; (pprint form)
+;;                [var (assoc opts
+;;                       :reify-fn
+;;                       (reify-rule-form-fn rule form))])
+;;              (vector entry {:reify-fn (default-reify-rule-form-fn)})))
+;;            reify)))
 
 
 
@@ -190,16 +260,21 @@
 ;;; forward chaining
 ;;; --------------------------------------------------------
 
+;; the variables in the reification section aren't actually independent
+;;   some of the variables being reified rely on other variables that
+;;   need to be reified.  so they need to be ordered or managed in some way
+
 (defn reify-bindings [reify-with-fns bindings]
   (reduce (fn [new-bindings [var {reify-fn :reify-fn}]]
-            ;; (pprint new-bindings)
-            ;; (pprint var)
-            (assoc new-bindings var (reify-fn bindings)))
-          {}
+            ;;check for key in bindings already (rule out optionals)
+            (if (bindings var)
+              new-bindings
+              (assoc new-bindings var (reify-fn bindings))))
+          {} ; this starting value could be bindings
           reify-with-fns))
 
 ;;instantiates a rule and puts the triples in the target kb
-(defn run-forward-rule [source-kb target-kb rule]
+(defn run-forward-rule [source-kb target-kb source-rule]
   ;; {head :head
   ;;                                            body :body
   ;;                                            reify :reify
@@ -207,12 +282,13 @@
   (let [{head :head
          body :body
          reify :reify
-         :as rule}    (add-reify-fns rule)]
+         :as rule}    (add-reify-fns source-rule)]
   ;; (let [reify-with-fns (map (fn [[var opts :as form]]
   ;;                             [var (assoc opts
   ;;                                    :reify-fn
   ;;                                    (reify-rule-form-fn form))])
   ;;                           reify)]
+    (pprint rule)
     (query-visit source-kb
                  (fn [bindings]
                    ;;(pprint bindings)

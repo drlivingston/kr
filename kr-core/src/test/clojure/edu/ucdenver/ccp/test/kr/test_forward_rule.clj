@@ -80,6 +80,18 @@
     (ex/c ex/hasBoss ex/boss2)
     (ex/c ex/atCompany ex/co2)))
 
+
+(def test-triples-md5-2
+  '((ex/a    foaf/firstname   "Alice" )
+    (ex/a ex/hasBoss ex/boss1)
+    (ex/a ex/atCompany ex/co1)
+
+    (ex/b ex/hasBoss ex/boss2)
+    (ex/b ex/atCompany ex/co1)
+
+    (ex/c ex/hasBoss ex/boss2)
+    (ex/c ex/atCompany ex/co2)))
+
 ;;; --------------------------------------------------------
 ;;; rules
 ;;; --------------------------------------------------------
@@ -143,6 +155,30 @@
                   :reify ([?/org {:ln (:md5 ?/boss ?/co)
                                   :ns "ex" :prefix "DEPT_"}])
                   })
+
+
+(def rule-8 '{:head ((?/hacker ex/inDept    ?/dept)
+                     (?/dept ex/deptID    ?/deptid)
+                     (?/dept   rdf/type     ex/Department))
+              :body ((?/hacker ex/hasBoss   ?/boss)
+                     (?/hacker ex/atCompany ?/co))
+              :reify ([?/dept {:ln (:md5 ?/boss ?/co)
+                               :ns "ex" :prefix "DEPT_"}]
+                      [?/deptid {:ln (:md5 ?/dept ?/co)
+                                 :ns "ex" :prefix "DEPT_"}])
+              })
+
+(def rule-8-inv '{:head ((?/hacker ex/inDept    ?/dept)
+                     (?/dept ex/deptID    ?/deptid)
+                     (?/dept   rdf/type     ex/Department))
+              :body ((?/hacker ex/hasBoss   ?/boss)
+                     (?/hacker ex/atCompany ?/co))
+              :reify ([?/deptid {:ln (:md5 ?/dept ?/co)
+                                 :ns "ex" :prefix "DEPT_"}]
+                      [?/dept {:ln (:md5 ?/boss ?/co)
+                               :ns "ex" :prefix "DEPT_"}])
+              })
+
 ;;; --------------------------------------------------------
 ;;; tests
 ;;; --------------------------------------------------------
@@ -218,6 +254,81 @@
                      ((first (query '((ex/c ex/inDept ?/dept)))) '?/dept))))
          (is (ask '((ex/a ex/inDept ?/dept)
                     (ex/b ex/inDept ?/dept)))))
+
+
+(kb-test test-forward-8-a test-triples-md5
+         (run-forward-rule *kb* *kb* rule-8)
+         (let [results (query '((?/org rdf/type ex/Department)))]
+           (is (= 2 (count results))))
+         (let [results (query '((?/person ex/inDept ?/dept)))]
+           (is (= 3 (count results))))
+
+         (is (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
+                ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept)))
+
+         (is (= ((first (query '((ex/a ex/inDept _/dept)
+                                 (_/dept ex/deptID ?/deptid))))
+                 '?/deptid)
+                ((first (query '((ex/b ex/inDept _/dept)
+                                 (_/dept ex/deptID ?/deptid))))
+                 '?/deptid)))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/c ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)))))
+
+
+(kb-test test-forward-8-b test-triples-md5
+         (run-forward-rule *kb* *kb* rule-8-inv)
+         (let [results (query '((?/org rdf/type ex/Department)))]
+           (is (= 2 (count results))))
+         (let [results (query '((?/person ex/inDept ?/dept)))]
+           (is (= 3 (count results))))
+
+         (is (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
+                ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept)))
+
+         (is (= ((first (query '((ex/a ex/inDept _/dept)
+                                 (_/dept ex/deptID ?/deptid))))
+                 '?/deptid)
+                ((first (query '((ex/b ex/inDept _/dept)
+                                 (_/dept ex/deptID ?/deptid))))
+                 '?/deptid)))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/c ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)))))
+
+
+(kb-test test-forward-8-c test-triples-md5-2
+         (run-forward-rule *kb* *kb* rule-8)
+         (is (not (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
+                     ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept))))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/c ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)))))
+
+(kb-test test-forward-8-d test-triples-md5-2
+         (run-forward-rule *kb* *kb* rule-8-inv)
+         (is (not (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
+                     ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept))))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/c ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)))))
 
 
 ;;; --------------------------------------------------------
