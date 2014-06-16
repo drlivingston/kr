@@ -114,8 +114,6 @@
 ;; this will take the above type of form and return a function
 ;; that will function to refify symbols for that form when passed the bindings
 
-;; (defmulti reify-rule-form-fn (fn [[var {type :type :as reify-opts}]]
-;;                                type))
 (defmulti reify-rule-form-fn
   (fn [rule reify-form]
     (cond 
@@ -221,23 +219,6 @@
               (vector entry (default-reify-rule-form-fn))))
           reify))))
 
-;; (defn add-reify-fns [{reify :reify :as rule}]
-;;   (assoc rule
-;;     :reify
-;;     (map (fn [entry]
-;;            (if (sequential? entry)
-;;              (let [[var opts :as form] entry]
-;;                ;; (pprint var)
-;;                ;; (pprint opts)
-;;                ;; (pprint form)
-;;                [var (assoc opts
-;;                       :reify-fn
-;;                       (reify-rule-form-fn rule form))])
-;;              (vector entry {:reify-fn (default-reify-rule-form-fn)})))
-;;            reify)))
-
-
-
 ;;; --------------------------------------------------------
 ;;; forward chaining
 ;;; --------------------------------------------------------
@@ -255,53 +236,22 @@
           bindings
           reify-with-fns))
 
-;; (defn reify-bindings [reify-with-fns bindings]
-;;   (reduce (fn [new-bindings [var {reify-fn :reify-fn}]]
-;;             ;;check for key in bindings already (rule out optionals)
-;;             (if (bindings var)
-;;               new-bindings
-;;               (assoc new-bindings var (reify-fn bindings))))
-;;           {} ; this starting value could be bindings
-;;           reify-with-fns))
-
 ;;instantiates a rule and puts the triples in the target kb
 (defn run-forward-rule [source-kb target-kb source-rule]
-  ;; {head :head
-  ;;                                            body :body
-  ;;                                            reify :reify
-  ;;                                            :as rule}]
   (let [{head :head
          body :body
          reify :reify
          :as rule}    (add-reify-fns source-rule)]
-  ;; (let [reify-with-fns (map (fn [[var opts :as form]]
-  ;;                             [var (assoc opts
-  ;;                                    :reify-fn
-  ;;                                    (reify-rule-form-fn form))])
-  ;;                           reify)]
     (pprint rule)
     (query-visit source-kb
                  (fn [bindings]
-                   ;;(pprint bindings)
                    (dorun
                     (map (partial add! target-kb)
-                         ;; (do 
-                         ;;  (pprint head)
-                         ;;  (pprint bindings)
-                         ;;  (pprint (reify-bindings reify ;;-with-fns
-                         ;;                          bindings))
                          (doall
-                          ;; set this to false temporarily --
-                          ;; trying to run with BigData
-                          ;; which re-uses the same connection
-                          ;; (reify-assertions (connection source-kb false) 
-                          ;;                (subst-bindings head bindings))))))
-                          ;;don't need to call reify-assertions nothing should
-                          ;;  there should be no free variables
                           (subst-bindings head
                                           ;;bindings
-                                          (reify-bindings reify ;;-with-fns
-                                                          bindings))))));)
+                                          (reify-bindings reify
+                                                          bindings))))))
                  body ;need to add reify find clauses on optionally
                  {:select-vars (concat (variables head)
                                        (variables reify))})))

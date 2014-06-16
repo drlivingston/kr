@@ -337,16 +337,13 @@
 (kb-test test-forward-8-d test-triples-md5-2
          (run-forward-rule *kb* *kb* rule-8-inv)
 
-         (pprint "test-forward-8-d test-triples-md5-2")
-
-         (pprint (query '((ex/a ex/inDept ?/dept))))
-         (pprint (query '((ex/b ex/inDept ?/dept))))
-
-         (pprint (query '((ex/a ex/inDept _/dept)
-                          (_/dept ex/deptID ?/deptid))))
-
-         (pprint (query '((ex/b ex/inDept _/dept)
-                          (_/dept ex/deptID ?/deptid))))
+         ;; (pprint "test-forward-8-d test-triples-md5-2")
+         ;; (pprint (query '((ex/a ex/inDept ?/dept))))
+         ;; (pprint (query '((ex/b ex/inDept ?/dept))))
+         ;; (pprint (query '((ex/a ex/inDept _/dept)
+         ;;                  (_/dept ex/deptID ?/deptid))))
+         ;; (pprint (query '((ex/b ex/inDept _/dept)
+         ;;                  (_/dept ex/deptID ?/deptid))))
 
          (is (not (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
                      ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept))))
@@ -369,11 +366,10 @@
 (kb-test test-forward-9-optional test-triples-md5-2
          (run-forward-rule *kb* *kb* rule-9-optional)
 
-         (pprint "test-forward-9-optional test-triples-md5-2")
-
-         (pprint (query '((ex/a ex/empname ?/empname))))
-         (pprint (query '((ex/b ex/empname ?/empname))))
-         (pprint (query '((ex/c ex/empname ?/empname))))
+         ;; (pprint "test-forward-9-optional test-triples-md5-2")
+         ;; (pprint (query '((ex/a ex/empname ?/empname))))
+         ;; (pprint (query '((ex/b ex/empname ?/empname))))
+         ;; (pprint (query '((ex/c ex/empname ?/empname))))
 
          (is (= ((first (query '((ex/a foaf/firstname ?/firstname)))) 
                  '?/firstname)
