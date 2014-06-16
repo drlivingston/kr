@@ -169,15 +169,24 @@
               })
 
 (def rule-8-inv '{:head ((?/hacker ex/inDept    ?/dept)
-                     (?/dept ex/deptID    ?/deptid)
-                     (?/dept   rdf/type     ex/Department))
-              :body ((?/hacker ex/hasBoss   ?/boss)
-                     (?/hacker ex/atCompany ?/co))
-              :reify ([?/deptid {:ln (:md5 ?/dept ?/co)
-                                 :ns "ex" :prefix "DEPT_"}]
-                      [?/dept {:ln (:md5 ?/boss ?/co)
-                               :ns "ex" :prefix "DEPT_"}])
-              })
+                         (?/dept ex/deptID    ?/deptid)
+                         (?/dept   rdf/type     ex/Department))
+                  :body ((?/hacker ex/hasBoss   ?/boss)
+                         (?/hacker ex/atCompany ?/co))
+                  :reify ([?/deptid {:ln (:md5 ?/dept ?/co)
+                                     :ns "ex" :prefix "DEPT_"}]
+                          [?/dept {:ln (:md5 ?/boss ?/co)
+                                   :ns "ex" :prefix "DEPT_"}])
+                  })
+
+(def rule-9-optional '{:head ((?/hacker ex/empname   ?/empname))
+                       :body ((?/hacker ex/atCompany ?/co)
+                              (:optional
+                               (?/hacker foaf/firstname ?/empname)))
+                       :reify ([?/empname {:ln (:md5 ?/hacker)
+                                           :ns "ex" :prefix "DEPT_"}])
+                       })
+
 
 ;;; --------------------------------------------------------
 ;;; tests
@@ -314,14 +323,9 @@
          (is (not (= ((first (query '((ex/a ex/inDept _/dept)
                                       (_/dept ex/deptID ?/deptid))))
                       '?/deptid)
-                     ((first (query '((ex/c ex/inDept _/dept)
+                     ((first (query '((ex/b ex/inDept _/dept)
                                       (_/dept ex/deptID ?/deptid))))
-                      '?/deptid)))))
-
-(kb-test test-forward-8-d test-triples-md5-2
-         (run-forward-rule *kb* *kb* rule-8-inv)
-         (is (not (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
-                     ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept))))
+                      '?/deptid))))
 
          (is (not (= ((first (query '((ex/a ex/inDept _/dept)
                                       (_/dept ex/deptID ?/deptid))))
@@ -330,6 +334,64 @@
                                       (_/dept ex/deptID ?/deptid))))
                       '?/deptid)))))
 
+(kb-test test-forward-8-d test-triples-md5-2
+         (run-forward-rule *kb* *kb* rule-8-inv)
+
+         (pprint "test-forward-8-d test-triples-md5-2")
+
+         (pprint (query '((ex/a ex/inDept ?/dept))))
+         (pprint (query '((ex/b ex/inDept ?/dept))))
+
+         (pprint (query '((ex/a ex/inDept _/dept)
+                          (_/dept ex/deptID ?/deptid))))
+
+         (pprint (query '((ex/b ex/inDept _/dept)
+                          (_/dept ex/deptID ?/deptid))))
+
+         (is (not (= ((first (query '((ex/a ex/inDept ?/dept)))) '?/dept)
+                     ((first (query '((ex/b ex/inDept ?/dept)))) '?/dept))))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/b ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid))))
+
+         (is (not (= ((first (query '((ex/a ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)
+                     ((first (query '((ex/c ex/inDept _/dept)
+                                      (_/dept ex/deptID ?/deptid))))
+                      '?/deptid)))))
+
+
+(kb-test test-forward-9-optional test-triples-md5-2
+         (run-forward-rule *kb* *kb* rule-9-optional)
+
+         (pprint "test-forward-9-optional test-triples-md5-2")
+
+         (pprint (query '((ex/a ex/empname ?/empname))))
+         (pprint (query '((ex/b ex/empname ?/empname))))
+         (pprint (query '((ex/c ex/empname ?/empname))))
+
+         (is (= ((first (query '((ex/a foaf/firstname ?/firstname)))) 
+                 '?/firstname)
+                ((first (query '((ex/a ex/empname ?/empname)))) 
+                 '?/empname)))
+
+         (is (not (= ((first (query '((ex/a ex/empname ?/empname)))) 
+                      '?/empname)
+                     ((first (query '((ex/b ex/empname ?/empname)))) 
+                      '?/empname))))
+         (is (not (= ((first (query '((ex/a ex/empname ?/empname)))) 
+                      '?/empname)
+                     ((first (query '((ex/c ex/empname ?/empname)))) 
+                      '?/empname))))
+         (is (not (= ((first (query '((ex/b ex/empname ?/empname)))) 
+                      '?/empname)
+                     ((first (query '((ex/c ex/empname ?/empname)))) 
+                      '?/empname)))))
 
 ;;; --------------------------------------------------------
 ;;; END

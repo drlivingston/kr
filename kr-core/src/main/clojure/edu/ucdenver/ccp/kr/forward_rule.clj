@@ -249,11 +249,20 @@
 (defn reify-bindings [reify-with-fns bindings]
   (reduce (fn [new-bindings [var {reify-fn :reify-fn}]]
             ;;check for key in bindings already (rule out optionals)
-            (if (bindings var)
+            (if (new-bindings var)
               new-bindings
-              (assoc new-bindings var (reify-fn bindings))))
-          {} ; this starting value could be bindings
+              (assoc new-bindings var (reify-fn new-bindings))))
+          bindings
           reify-with-fns))
+
+;; (defn reify-bindings [reify-with-fns bindings]
+;;   (reduce (fn [new-bindings [var {reify-fn :reify-fn}]]
+;;             ;;check for key in bindings already (rule out optionals)
+;;             (if (bindings var)
+;;               new-bindings
+;;               (assoc new-bindings var (reify-fn bindings))))
+;;           {} ; this starting value could be bindings
+;;           reify-with-fns))
 
 ;;instantiates a rule and puts the triples in the target kb
 (defn run-forward-rule [source-kb target-kb source-rule]
@@ -290,7 +299,7 @@
                           ;;don't need to call reify-assertions nothing should
                           ;;  there should be no free variables
                           (subst-bindings head
-                                          bindings
+                                          ;;bindings
                                           (reify-bindings reify ;;-with-fns
                                                           bindings))))));)
                  body ;need to add reify find clauses on optionally
