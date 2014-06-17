@@ -146,7 +146,7 @@
   (extend-reify-map reify-opts
                     (fn [bindings]
                       (with-reify-name-bindings reify-opts
-                        (apply reify-localname (map bindings params))))
+                        (apply reify-localname (subst-bindings params bindings))))
                     (variables params)))
 
 (defmethod reify-rule-form-fn :md5 [rule
@@ -155,7 +155,7 @@
   (extend-reify-map reify-opts
                     (fn [bindings]
                       (with-reify-name-bindings reify-opts
-                        (apply reify-md5 (map bindings params))))
+                        (apply reify-md5 (subst-bindings params bindings))))
                     (variables params)))
 
 (defmethod reify-rule-form-fn :regex [rule
@@ -164,7 +164,9 @@
   (extend-reify-map reify-opts
                     (fn [bindings]
                       (with-reify-name-bindings reify-opts
-                        (apply reify-regex match replace (map bindings vars))))
+                        (apply reify-regex match replace 
+                               (subst-bindings vars bindings))))
+                        ;;(apply reify-regex match replace (map bindings vars))))
                     (variables vars)))
 
 

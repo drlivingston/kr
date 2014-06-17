@@ -187,6 +187,32 @@
                                            :ns "ex" :prefix "DEPT_"}])
                        })
 
+;; this is to test that constants are used in the reifiction
+;;  bug https://github.com/drlivingston/kr/issues/7
+;;  causing potential collision
+(def rule-10 '{:head ((?/hacker ex/inDept    ?/dept)
+                      (?/dept   ex/deptID    ?/deptid)
+                      (?/dept   rdf/type     ex/Department))
+               :body ((?/hacker ex/hasBoss   ?/boss)
+                      (?/hacker ex/atCompany ?/co))
+               :reify ([?/dept {:ln (:md5 ?/boss ?/co)
+                                :ns "ex" :prefix "D_"}]
+                       [?/deptid {:ln (:md5 'ex/ID ?/boss ?/co)
+                                  :ns "ex" :prefix "D_"}])
+               })
+
+;;this rule should throw an exception due to loop in reification dependencies
+(def rule-11-exception '{:head ((?/hacker ex/inDept    ?/dept)
+                                (?/dept   ex/deptID    ?/deptid)
+                                (?/dept   rdf/type     ex/Department))
+                         :body ((?/hacker ex/hasBoss   ?/boss)
+                                (?/hacker ex/atCompany ?/co))
+                         :reify ([?/dept {:ln (:md5 ?/deptid ?/co)
+                                          :ns "ex" :prefix "D_"}]
+                                 [?/deptid {:ln (:md5 ?/dept ?/co)
+                                            :ns "ex" :prefix "D_"}])
+                         })
+
 
 ;;; --------------------------------------------------------
 ;;; tests
@@ -388,6 +414,17 @@
                       '?/empname)
                      ((first (query '((ex/c ex/empname ?/empname)))) 
                       '?/empname)))))
+
+;;test for collision due to reification potentially not looking at constants
+(kb-test test-forward-10 test-triples-md5-2
+         (run-forward-rule *kb* *kb* rule-10)
+
+         (is (not (ask '((?/deptid   ex/deptID    ?/deptid))))))
+
+;;this should thorw an exception becuase of a loop in the reification
+(kb-test test-forward-10 test-triples-md5-2
+         (is (thrown? Exception (run-forward-rule *kb* *kb* rule-11-exception))))
+
 
 ;;; --------------------------------------------------------
 ;;; END
