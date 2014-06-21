@@ -1,4 +1,4 @@
-# Clojure API for RDF and SPARQL - provides consistent access to APIs including Jena and Sesame
+# Clojure API for RDF and SPARQL
 
 The Knowledge Representation and Reasoning Tools library enables easy Clojure use of RDF and SPARQL, provinging a unified interface for both Jena and Sesame.  (KR can be extended for other APIs and underlying triplestores.)
 
