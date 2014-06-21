@@ -207,6 +207,45 @@
          (is (= () (query-rdf *kb* 'ex/a 'ex/b 'ex/c 'ex/z))))
 
 
+(kb-test test-add-query-uris nil
+         (is (nil? (add *kb* 
+                        (URI. "http://www.example.org/a") 
+                        (URI. "http://www.example.org/b") 
+                        (URI. "http://www.example.org/c"))))
+         (is (ask-rdf *kb* 'ex/a 'ex/b 'ex/c))
+         (is (ask-rdf *kb* 
+                      (URI. "http://www.example.org/a") 
+                      (URI. "http://www.example.org/b") 
+                      (URI. "http://www.example.org/c"))))
+
+(kb-test test-literal-type-uris nil
+         (is (nil? (add *kb* 
+                        (URI. "http://www.example.org/a") 
+                        (URI. "http://www.example.org/b") 
+                        [4 (URI. "http://www.w3.org/2001/XMLSchema#integer")])))
+         (is (ask-rdf *kb* 'ex/a 'ex/b 4))
+         (is (ask-rdf *kb* 
+                      (URI. "http://www.example.org/a") 
+                      (URI. "http://www.example.org/b")
+                      [4 (URI. "http://www.w3.org/2001/XMLSchema#integer")])))
+
+
+(kb-test test-literal-custom-type nil
+         (is (nil? (add *kb* 'ex/a 'ex/b ["foo" 'ex/custom])))
+         (is (ask-rdf *kb* 'ex/a 'ex/b ["foo" 'ex/custom])))
+
+(kb-test test-literal-custom-type-uris nil
+         (is (nil? (add *kb* 
+                        (URI. "http://www.example.org/a") 
+                        (URI. "http://www.example.org/b") 
+                        ["foo" (URI. "http://www.example.org/custom")])))
+         (is (ask-rdf *kb* 'ex/a 'ex/b ["foo" 'ex/custom]))
+         (is (ask-rdf *kb* 
+                      (URI. "http://www.example.org/a") 
+                      (URI. "http://www.example.org/b")
+                      ["foo" (URI. "http://www.example.org/custom")])))
+
+
 
 
 ;;; --------------------------------------------------------

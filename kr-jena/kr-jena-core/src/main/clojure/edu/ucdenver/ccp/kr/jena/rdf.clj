@@ -125,9 +125,8 @@
        (.createLiteral (model kb) x type)
        (.createTypedLiteral (model kb) 
                             x
-                            (.getTypeByName (TypeMapper/getInstance) 
-                                            (str (resource kb type)))))))
-
+                            (.getSafeTypeByName (TypeMapper/getInstance)
+                                                (str (resource kb type)))))))
 
 (defn jena-create-statement 
   ([kb [s p o]] (jena-create-statement kb s p o))

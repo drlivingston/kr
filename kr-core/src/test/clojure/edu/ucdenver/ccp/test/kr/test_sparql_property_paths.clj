@@ -6,7 +6,8 @@
        edu.ucdenver.ccp.kr.variable
        edu.ucdenver.ccp.kr.kb
        edu.ucdenver.ccp.kr.rdf
-       edu.ucdenver.ccp.kr.sparql))
+       edu.ucdenver.ccp.kr.sparql)
+  (import java.net.URI))
 
 
 
@@ -86,6 +87,103 @@
   (is (= 1
          (count 
           (query '((?/person ([foaf/knows +] foaf/age) 40)))))))
+
+
+(kb-test test-basic-symbol-pattern-uris test-triples-property-paths
+  (is (= 1
+         (count 
+          (query `((ex/a ~(URI. "http://xmlns.com/foaf/0.1/knows") ?/person))))))
+  (is (= 2
+         (count 
+          (query `((ex/a 
+                    [~(URI. "http://xmlns.com/foaf/0.1/knows") +] 
+                    ?/person))))))
+  (is (= 3 ;can bind to self
+         (count 
+          (query `((ex/a 
+                    [~(URI. "http://xmlns.com/foaf/0.1/knows") *] 
+                    ?/person))))))
+  (is (= 2 ;can bind to self
+         (count 
+          (query `((ex/a 
+                    [~(URI. "http://xmlns.com/foaf/0.1/knows") ?] 
+                    ?/person)))))))
+
+(kb-test test-basic-sequence-pattern-uris test-triples-property-paths
+  (is (= 1
+         (count 
+          (query `((ex/a 
+                    (~(URI. "http://xmlns.com/foaf/0.1/knows") foaf/age)
+                    ?/age))))))
+
+  (is (= 2
+         (count 
+          (query `((ex/a 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] foaf/age) 
+                    ?/age))))))
+  
+  (is (= 3 ;; alice knows alice, alice knows bob, bob knows himself
+         (count 
+          (query `((?/person 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") *] foaf/age)
+                    40))))))
+
+  (is ;; alice knows alice, alice knows bob,
+   (ask `((ex/a 
+           ([~(URI. "http://xmlns.com/foaf/0.1/knows") *] foaf/age)
+           40))))
+
+  (is ;; alice knows bob,
+   (ask `((ex/a 
+           ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] foaf/age)
+           40))))
+
+  (is (= 1
+         (count 
+          (query `((?/person 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] foaf/age)
+                    40)))))))
+
+(kb-test test-basic-sequence-pattern-uris-2 test-triples-property-paths
+  (is (= 1
+         (count 
+          (query `((ex/a 
+                    (~(URI. "http://xmlns.com/foaf/0.1/knows") 
+                     ~(URI. "http://xmlns.com/foaf/0.1/age"))
+                    ?/age))))))
+
+  (is (= 2
+         (count 
+          (query `((ex/a 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] 
+                       ~(URI. "http://xmlns.com/foaf/0.1/age")) 
+                    ?/age))))))
+  
+  (is (= 3 ;; alice knows alice, alice knows bob, bob knows himself
+         (count 
+          (query `((?/person 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") *] 
+                       ~(URI. "http://xmlns.com/foaf/0.1/age"))
+                    40))))))
+
+  (is ;; alice knows alice, alice knows bob,
+   (ask `((ex/a 
+           ([~(URI. "http://xmlns.com/foaf/0.1/knows") *] 
+              ~(URI. "http://xmlns.com/foaf/0.1/age"))
+           40))))
+
+  (is ;; alice knows bob,
+   (ask `((ex/a 
+           ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] 
+              ~(URI. "http://xmlns.com/foaf/0.1/age"))
+           40))))
+
+  (is (= 1
+         (count 
+          (query `((?/person 
+                    ([~(URI. "http://xmlns.com/foaf/0.1/knows") +] 
+                       ~(URI. "http://xmlns.com/foaf/0.1/age"))
+                    40)))))))
 
 
 ;; (kb-test test-construct-visit-pattern test-triples-6-1

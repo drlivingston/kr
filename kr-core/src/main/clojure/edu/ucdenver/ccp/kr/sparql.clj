@@ -88,7 +88,7 @@
 ;;(defmulti sparql-ify type)
 (defmulti sparql-ify (fn [thing] (type thing)))
 
-;;(defmethod sparql-ify clojure.lang.Symbol [s] (sparql-ify-sym kb s))
+(defmethod sparql-ify clojure.lang.Symbol [s] (sym-to-sparql s))
 
 (defmethod sparql-ify java.net.URI [s] (sparql-ify-uri s))
 
@@ -117,7 +117,7 @@
                            (string? type)) (sparql-str-lang x type)
                       ;; typed
                       :else (str (pr-str (str x)) "^^" 
-                                 (str (sym-to-sparql type)))))
+                                 (str (sparql-ify type)))))
    ;; plain string default language
    (and (string? s) 
         *use-default-language*

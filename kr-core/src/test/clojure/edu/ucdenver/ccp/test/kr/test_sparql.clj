@@ -81,6 +81,14 @@
        (ex/b    foaf/firstname   ["Bob" "en"])
        (ex/c    foaf/firstname   ["Bob"])))
 
+(def test-triples-custom-type
+  '((ex/a    ex/p   ["foo" ex/custom])
+    (ex/b    ex/p   ["foo" ex/custom2])))
+
+(def test-triples-custom-type-uri
+  `((ex/a    ex/p   ["foo" ex/custom])
+    (ex/b    ex/p   ["foo" ~(URI. "http://www.example.org/custom")])))
+
 
 
 ;;; --------------------------------------------------------
@@ -314,6 +322,25 @@
              (count (query `((~uri-a foaf/knows ?/person2))))))
       (is (ask `((~uri-a foaf/knows ~uri-b))))
       )
+
+
+(kb-test test-custom-type  test-triples-custom-type
+      (is (= 2
+             (count (query '((?/person1 ex/p ?/custom))))))
+      (is (= 1
+             (count (query '((?/a ex/p ["foo" ex/custom])))))))
+
+(kb-test test-custom-type-uri  test-triples-custom-type-uri
+      (is (= 2
+             (count (query '((?/person1 ex/p ?/custom))))))
+      (is (= 2
+             (count (query '((?/a ?/p ["foo" ex/custom]))))))
+      (is (= 2
+             (count 
+              (query `((?/a 
+                        ?/p 
+                        ["foo" ~(URI. "http://www.example.org/custom")])))))))
+
 
 
 ;;; --------------------------------------------------------
