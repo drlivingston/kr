@@ -1,8 +1,13 @@
-# Knowledge Representation and Reasoning Tools
+# Clojure API for RDF and SPARQL - provides consistent access to APIs including Jena and Sesame
+
+The Knowledge Representation and Reasoning Tools library enables easy Clojure use of RDF and SPARQL, provinging a unified interface for both Jena and Sesame.  (KR can be extended for other APIs and underlying triplestores.)
+
 
 ## Overview
 
-The KR library is for working with knowledge representations and knowledge bases.  Currently it facilitates use of RDF-based representations backed by triple-/quad- stores.  It provides a consistent clojure based way of interacting with its backing implementations, which currently include the Jena and Sesame APIs.
+Currently it facilitates use of RDF-based representations backed by triple-/quad- stores.  It provides a consistent clojure based way of interacting with its backing implementations, which currently include the Jena and Sesame APIs. The library enables easy working with knowledge representations and knowledge bases, and provides support for some common tasks including forward-chaining and reification.
+
+[[Release Notes]]
 
 update: see the note on [Sesame Versions]
 
@@ -92,7 +97,7 @@ the core dependency is kr-core:
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-core</artifactId>
-  <version>1.4.16</version>
+  <version>1.4.17</version>
 </dependency>
 ```
 
@@ -101,13 +106,13 @@ but the core dependency is unnecessary if you are brining in either the sesame o
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-sesame-core</artifactId>
-  <version>1.4.16</version>
+  <version>1.4.17</version>
 </dependency>
 
 <dependency>
   <groupId>edu.ucdenver.ccp</groupId>
   <artifactId>kr-jena-core</artifactId>
-  <version>1.4.16</version>
+  <version>1.4.17</version>
 </dependency>
 ```
 
