@@ -7,7 +7,7 @@ The Knowledge Representation and Reasoning Tools library enables easy Clojure us
 
 Currently it facilitates use of RDF-based representations backed by triple-/quad- stores.  It provides a consistent clojure based way of interacting with its backing implementations, which currently include the Jena and Sesame APIs. The library enables easy working with knowledge representations and knowledge bases, and provides support for some common tasks including forward-chaining and reification.
 
-[[Release Notes]]
+[Release Notes]
 
 update: see the note on [Sesame Versions]
 
