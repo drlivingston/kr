@@ -130,3 +130,4 @@ primary developer: [Kevin Livingston][]
 [University of Colorado Denver]: http://www.ucdenver.edu/
 [Kevin Livingston]: https://github.com/drlivingston
 [Sesame Versions]:https://github.com/drlivingston/kr/wiki/versions-and-sesame
+[Release Notes]:https://github.com/drlivingston/kr/wiki/Release-notes
