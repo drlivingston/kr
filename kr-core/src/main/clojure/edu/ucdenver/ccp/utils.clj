@@ -102,8 +102,13 @@
   (distinct
    (mapcat (fn [cp-part]
              (cond
-              (jar-file? cp-part) (map (partial str "@")
-                                       (filenames-in-jar (JarFile. cp-part)))
+              ;;(or
+               (jar-file? cp-part)
+               ;; (let [f (file cp-part)]
+               ;;   (and (.isFile f)
+               ;;        (.endsWith (.getName f) "jar"))))
+                (map (partial str "@")
+                     (filenames-in-jar (JarFile. cp-part)))
               (.isDirectory cp-part) (cons cp-part
                                            (directory-seq cp-part))
               (nil? cp-part) nil
