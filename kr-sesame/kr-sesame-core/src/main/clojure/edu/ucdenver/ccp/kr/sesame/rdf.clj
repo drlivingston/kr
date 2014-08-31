@@ -175,12 +175,20 @@
 (defn literal-to-value [kb l]
   (literal-clj-ify kb l)) 
 
+(defn literal-language [l]
+  (let [lang (.getLanguage l)]
+    (if (= "" lang)
+      nil
+      lang)))
+
+
 (defn literal-type-or-language [kb l]
   (or (let [dt (.getDatatype l)]
         (and dt 
              (clj-ify kb dt)))
              ;;(convert-string-to-sym kb dt)))
-      (.getLanguage l)))
+      (literal-language l)))
+      ;;(.getLanguage l)))
 
 (defn literal-to-clj [kb l]
   (clj-ify-literal kb l 

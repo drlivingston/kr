@@ -264,6 +264,7 @@
          (is (nil? (add *kb* 'ex/g 'ex/h ["Bob" "en"])))
          (is (nil? (add *kb* 'ex/i 'ex/j ["Bob" ""])))
          (is (nil? (add *kb* 'ex/k 'ex/l 4)))
+         (is (nil? (add *kb* 'ex/m 'ex/n ["Bob"])))
 
          (binding [*literal-mode* nil]
            (is (= "foo" (get-literal 'ex/a 'ex/b)))
@@ -271,7 +272,8 @@
            (is (= 4 (get-literal 'ex/e 'ex/f)))
            (is (= "Bob" (get-literal 'ex/g 'ex/h)))
            (is (= "Bob" (get-literal 'ex/i 'ex/j)))
-           (is (= 4 (get-literal 'ex/k 'ex/l))))
+           (is (= 4 (get-literal 'ex/k 'ex/l)))
+           (is (= "Bob" (get-literal 'ex/m 'ex/n))))
 
          (binding [*literal-mode* :clj]
            (is (= "foo" (get-literal 'ex/a 'ex/b)))
@@ -279,24 +281,57 @@
            (is (= 4 (get-literal 'ex/e 'ex/f)))
            (is (= "Bob" (get-literal 'ex/g 'ex/h)))
            (is (= "Bob" (get-literal 'ex/i 'ex/j)))
-           (is (= 4 (get-literal 'ex/k 'ex/l))))
+           (is (= 4 (get-literal 'ex/k 'ex/l)))
+           (is (= "Bob" (get-literal 'ex/m 'ex/n))))
+
 
          (binding [*literal-mode* :clj-type]
            (is (= ["foo" 'ex/custom] (get-literal 'ex/a 'ex/b)))
            (is (= [4 'xsd/integer] (get-literal 'ex/c 'ex/d)))
            (is (= [4 'xsd/integer] (get-literal 'ex/e 'ex/f)))
            (is (= ["Bob" "en"] (get-literal 'ex/g 'ex/h)))
-           (is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
-           (is (= [4 'xsd/integer] (get-literal 'ex/k 'ex/l))))
+           ;;(is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
+           (is (= ["Bob" nil] (get-literal 'ex/i 'ex/j)))
+           (is (= [4 'xsd/integer] (get-literal 'ex/k 'ex/l)))
+           (is (= ["Bob" nil] (get-literal 'ex/m 'ex/n))))
+
 
          (binding [*literal-mode* :string]
            (is (= ["foo" 'ex/custom] (get-literal 'ex/a 'ex/b)))
            (is (= ["4" 'xsd/integer] (get-literal 'ex/c 'ex/d)))
            (is (= ["4" 'xsd/integer] (get-literal 'ex/e 'ex/f)))
            (is (= ["Bob" "en"] (get-literal 'ex/g 'ex/h)))
-           (is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
-           (is (= ["4" 'xsd/integer] (get-literal 'ex/k 'ex/l))))
+           ;;(is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
+           (is (= ["Bob" nil] (get-literal 'ex/i 'ex/j)))
+           (is (= ["4" 'xsd/integer] (get-literal 'ex/k 'ex/l)))
+           (is (= ["Bob" nil] (get-literal 'ex/m 'ex/n))))
 
+
+         (binding [*literal-mode* (fn [lit type-or-lang]
+                                    (if (= type-or-lang 'ex/custom)
+                                         :clj-type
+                                         nil))]
+           (is (= ["foo" 'ex/custom] (get-literal 'ex/a 'ex/b)))
+           (is (= 4 (get-literal 'ex/c 'ex/d)))
+           (is (= 4 (get-literal 'ex/e 'ex/f)))
+           (is (= "Bob" (get-literal 'ex/g 'ex/h)))
+           (is (= "Bob" (get-literal 'ex/i 'ex/j)))
+           (is (= 4  (get-literal 'ex/k 'ex/l)))
+           (is (= "Bob" (get-literal 'ex/m 'ex/n))))
+
+
+         (binding [*literal-mode* (fn [lit type-or-lang]
+                                    (if (string? type-or-lang)
+                                         :clj-type
+                                         nil))]
+           (is (= "foo" (get-literal 'ex/a 'ex/b)))
+           (is (= 4 (get-literal 'ex/c 'ex/d)))
+           (is (= 4 (get-literal 'ex/e 'ex/f)))
+           (is (= ["Bob" "en"] (get-literal 'ex/g 'ex/h)))
+           ;;(is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
+           (is (= "Bob" (get-literal 'ex/i 'ex/j)))
+           (is (= 4 (get-literal 'ex/k 'ex/l)))
+           (is (= "Bob" (get-literal 'ex/m 'ex/n))))
 
 )
 

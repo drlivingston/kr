@@ -164,11 +164,18 @@
       (. val lexicalValue)
       val)))
 
+(defn literal-language [l]
+  (let [lang (.getLanguage l)]
+    (if (= "" lang)
+      nil
+      lang)))
+
 (defn literal-type-or-language [kb l]
   (or (let [dt (.getDatatypeURI l)]
         (and dt
              (convert-string-to-sym kb dt)))
-      (.getLanguage l)))
+      (literal-language l)))
+      ;;(.getLanguage l)))
 
 (defn literal-to-clj [kb l]
   (clj-ify-literal kb l 
