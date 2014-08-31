@@ -141,6 +141,42 @@
   ([m n] (.createResource (model m) (jena-anon-id n))))
 
 ;;; --------------------------------------------------------
+;;; literal clj-ify
+;;; --------------------------------------------------------
+
+(defn literal-to-string-value [kb l]
+  (.getLexicalForm l))
+  ;;(str l))
+
+;; (defn literal-to-value [kb l]
+;;   (println "literal value")
+;;   (prn l)
+;;   (prn (.getLiteralValue l))
+;;   (println "")
+;;   (.getLiteralValue l))
+
+(defn literal-node-to-value [kb l]
+  (.getLiteralValue l))
+
+(defn literal-to-value [kb l]
+  (let [val (.getValue l)]
+    (if (instance? com.hp.hpl.jena.datatypes.BaseDatatype$TypedValue val)
+      (. val lexicalValue)
+      val)))
+
+(defn literal-type-or-language [kb l]
+  (or (let [dt (.getDatatypeURI l)]
+        (and dt
+             (convert-string-to-sym kb dt)))
+      (.getLanguage l)))
+
+(defn literal-to-clj [kb l]
+  (clj-ify-literal kb l 
+                   literal-to-value 
+                   literal-to-string-value 
+                   literal-type-or-language))
+
+;;; --------------------------------------------------------
 ;;; creating clj data structures from Jena objects
 ;;; --------------------------------------------------------
 
@@ -170,16 +206,41 @@
 (defmethod clj-ify com.hp.hpl.jena.graph.Node_Blank [kb b]
   (symbol *anon-ns-name* (str (.getLabelString (.getBlankNodeId b)))))
 
-(defmethod clj-ify com.hp.hpl.jena.graph.Node_Literal [kb l] 
-  (.getLiteralValue l))
+(defmethod clj-ify com.hp.hpl.jena.graph.Node_Literal [kb l]
+  (clj-ify-literal kb l 
+                   literal-node-to-value 
+                   literal-to-string-value 
+                   literal-type-or-language))
+;;  (literal-to-clj kb l))
 
+  ;;(.getLiteralValue l))
+
+(defmethod clj-ify com.hp.hpl.jena.rdf.model.Literal [kb l]
+  (clj-ify-literal kb l 
+                   literal-to-value 
+                   literal-to-string-value 
+                   literal-type-or-language))
+
+(defmethod clj-ify com.hp.hpl.jena.datatypes.BaseDatatype$TypedValue [kb l]
+  (clj-ify-literal kb l 
+                   literal-to-value 
+                   literal-to-string-value 
+                   literal-type-or-language))
+
+;;  (literal-to-clj kb l))
 
 ;; Properties are resources - nothing to do special
 ;;   unless meta data is of interest
 ;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.PropertyImpl [p]
 ;;   (resource-to-sym p))
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
-  (.getValue l))
+;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
+;;   (literal-to-clj kb l))
+
+;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.Literal [kb l] 
+;;   (.getValue l))
+ ;;(literal-to-clj kb l))
+
+;;(.getValue l))
 
 ;; statements
 (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.StatementImpl [kb s] 

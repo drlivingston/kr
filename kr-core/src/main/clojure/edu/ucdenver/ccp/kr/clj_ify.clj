@@ -9,7 +9,8 @@
 
 (defmulti clj-ify (fn [kb obj]
                     ;;(println (type obj))
-                    (type obj)))
+                    (class obj)))
+                    ;;(type obj)))
 
 (defn clj
   ([x] (clj-ify *kb* x))
@@ -42,6 +43,92 @@
 (defmethod clj-ify java.lang.Boolean [kb bool] bool)
 
 (defmethod clj-ify clojure.lang.Symbol [kb sym] sym)
+
+
+;;; --------------------------------------------------------
+;;; string-literal
+;;; --------------------------------------------------------
+
+(defmulti string-ify-literal (fn [kb obj]
+                               (type obj)))
+
+(defmethod string-ify-literal :default [kb x] 
+  (str x))
+;;(throw (IllegalArgumentException. (str "Unknown Type for: " x))))
+
+
+;;; --------------------------------------------------------
+;;; clj-ify-literal
+;;; --------------------------------------------------------
+
+;;takes values:
+;; nil or :clj for converting to clj objects
+;; :clj-type to return a vector of [clj-object type-or-language]
+;; :string to return a vector of [string-serialization type-or-language]
+;; :native to return a vector of [native-literal type-or-language]
+;; function that takes [clj-object type-or-language] and
+;;    returns one of the above values
+
+(def ^:dynamic *literal-mode* nil)
+
+;; (defn literal-mode [literal type-or-langauge]
+;;   (cond (nil? *literal-mode*) nil
+;;         (keyword? *literal-mode*) *literal-mode*
+;;         :else (*literal-mode* literal type-or-language)))
+
+;; (defn clj-ify-literal [literal type-or-langauge]
+;;   (case (literal-mode literal type-or-langauge)
+;;     nil       (clj-ify literal)
+;;     :clj      (clj-ify literal)
+;;     :clj-type (vector (clj-ify literal) type-or-language)
+;;     :string   (vector (string-ify-literal literal) type-or-language)
+;;     :native   (vector literal type-or-language)))
+
+(defn nil-symbol-string? [mode]
+  (or (nil? mode)
+      (keyword? mode)
+      (symbol? mode)
+      (string? mode)))
+
+(defn type-or-language-value [kb literal type-or-language]
+  (if (nil-symbol-string? type-or-language)
+    type-or-language
+    (type-or-language kb literal)))
+  ;; (if (function? type-or-language)
+  ;;   (type-or-langague kb literal)
+  ;;   type-or-language))
+
+(defn clj-ify-literal-key [kb mode literal to-value-fn to-string-fn type-or-language]
+  (case mode
+    nil       (to-value-fn kb literal)
+    :clj      (to-value-fn kb literal)
+    :clj-type (vector (to-value-fn kb literal) 
+                      (type-or-language-value kb literal type-or-language))
+    :string   (vector (to-string-fn kb literal)
+                      (type-or-language-value kb literal type-or-language))
+    :native   (vector literal
+                      (type-or-language-value kb literal type-or-language))))
+
+
+(defn clj-ify-literal [kb literal to-value-fn to-string-fn type-or-language-fn]
+  (if (nil-symbol-string? *literal-mode*)
+    (clj-ify-literal-key kb *literal-mode* literal 
+                         to-value-fn to-string-fn type-or-language-fn)
+    (let [type-or-language (type-or-language-fn kb literal)
+          mode (*literal-mode* literal type-or-language)]
+      (clj-ify-literal-key kb mode literal 
+                           to-value-fn to-string-fn type-or-language))))
+
+
+
+
+  ;; (cond (nil? *literal-mode*) (to-value-fn literal)
+  ;;   nil       (clj-ify literal)
+  ;;   :clj      (clj-ify literal)
+  ;;   :clj-type (vector (clj-ify literal) type-or-language)
+  ;;   :string   (vector (string-ify-literal literal) type-or-language)
+  ;;   :native   (vector literal type-or-language)))
+
 
 ;;; --------------------------------------------------------
 ;;; end

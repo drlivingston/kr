@@ -245,6 +245,62 @@
                       (URI. "http://www.example.org/b")
                       ["foo" (URI. "http://www.example.org/custom")])))
 
+;; query returns a list of triples, we're always looking for one
+(defn get-literal [s p]
+  (nth (first (query-rdf *kb* s p nil))
+       2))
+  
+
+(kb-test test-literal-mode nil
+         (is (nil? (add *kb* 
+                        (URI. "http://www.example.org/a") 
+                        (URI. "http://www.example.org/b") 
+                        ["foo" (URI. "http://www.example.org/custom")])))
+         (is (nil? (add *kb* 
+                        (URI. "http://www.example.org/c") 
+                        (URI. "http://www.example.org/d")
+                        [4 (URI. "http://www.w3.org/2001/XMLSchema#integer")])))
+         (is (nil? (add *kb* 'ex/e 'ex/f [4 'xsd/integer])))
+         (is (nil? (add *kb* 'ex/g 'ex/h ["Bob" "en"])))
+         (is (nil? (add *kb* 'ex/i 'ex/j ["Bob" ""])))
+         (is (nil? (add *kb* 'ex/k 'ex/l 4)))
+
+         (binding [*literal-mode* nil]
+           (is (= "foo" (get-literal 'ex/a 'ex/b)))
+           (is (= 4 (get-literal 'ex/c 'ex/d)))
+           (is (= 4 (get-literal 'ex/e 'ex/f)))
+           (is (= "Bob" (get-literal 'ex/g 'ex/h)))
+           (is (= "Bob" (get-literal 'ex/i 'ex/j)))
+           (is (= 4 (get-literal 'ex/k 'ex/l))))
+
+         (binding [*literal-mode* :clj]
+           (is (= "foo" (get-literal 'ex/a 'ex/b)))
+           (is (= 4 (get-literal 'ex/c 'ex/d)))
+           (is (= 4 (get-literal 'ex/e 'ex/f)))
+           (is (= "Bob" (get-literal 'ex/g 'ex/h)))
+           (is (= "Bob" (get-literal 'ex/i 'ex/j)))
+           (is (= 4 (get-literal 'ex/k 'ex/l))))
+
+         (binding [*literal-mode* :clj-type]
+           (is (= ["foo" 'ex/custom] (get-literal 'ex/a 'ex/b)))
+           (is (= [4 'xsd/integer] (get-literal 'ex/c 'ex/d)))
+           (is (= [4 'xsd/integer] (get-literal 'ex/e 'ex/f)))
+           (is (= ["Bob" "en"] (get-literal 'ex/g 'ex/h)))
+           (is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
+           (is (= [4 'xsd/integer] (get-literal 'ex/k 'ex/l))))
+
+         (binding [*literal-mode* :string]
+           (is (= ["foo" 'ex/custom] (get-literal 'ex/a 'ex/b)))
+           (is (= ["4" 'xsd/integer] (get-literal 'ex/c 'ex/d)))
+           (is (= ["4" 'xsd/integer] (get-literal 'ex/e 'ex/f)))
+           (is (= ["Bob" "en"] (get-literal 'ex/g 'ex/h)))
+           (is (= ["Bob" ""] (get-literal 'ex/i 'ex/j)))
+           (is (= ["4" 'xsd/integer] (get-literal 'ex/k 'ex/l))))
+
+
+)
+
+
 
 
 

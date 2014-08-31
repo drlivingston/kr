@@ -127,6 +127,7 @@
 ;;; literal-types
 ;;; --------------------------------------------------------
 
+
 (defmulti literal-clj-ify (fn [kb l]
                             (let [t (.getDatatype l)]
                               (and t (.toString t)))))
@@ -167,6 +168,26 @@
 (lit-clj-ify "http://www.w3.org/2001/XMLSchema#gDay" (.calendarValue l))
 
 
+(defn literal-to-string-value [kb l]
+  (.stringValue l))
+  ;;(str l))
+
+(defn literal-to-value [kb l]
+  (literal-clj-ify kb l)) 
+
+(defn literal-type-or-language [kb l]
+  (or (let [dt (.getDatatype l)]
+        (and dt 
+             (clj-ify kb dt)))
+             ;;(convert-string-to-sym kb dt)))
+      (.getLanguage l)))
+
+(defn literal-to-clj [kb l]
+  (clj-ify-literal kb l 
+                   literal-to-value 
+                   literal-to-string-value 
+                   literal-type-or-language))
+
 ;;; clj-ify
 ;;; --------------------------------------------------------
 
@@ -189,7 +210,8 @@
 ;;need to get numbers back out of literals
 ;;(defmethod clj-ify org.openrdf.model.impl.LiteralImpl [kb v]
 (defmethod clj-ify org.openrdf.model.Literal [kb v]
-  (literal-clj-ify kb v))
+  (literal-to-clj kb v))
+  ;;(literal-clj-ify kb v))
 
 
 (defmethod clj-ify org.openrdf.model.Value [kb v]
