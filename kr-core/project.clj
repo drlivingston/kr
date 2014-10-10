@@ -1,6 +1,5 @@
 (defproject edu.ucdenver.ccp/kr-core "1.4.20-SNAPSHOT"
   :description "KR core API and tools."
-  :parent [edu.ucdenver.ccp/kr "1.4.20-SNAPSHOT" :relative-path "../pom.xml"]
   :parent-project {:path "../project.clj"
                    :inherit [:dependencies  :license]
                    :only-deps [org.clojure/clojure

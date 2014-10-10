@@ -1,6 +1,5 @@
 (defproject edu.ucdenver.ccp/kr-jena-core "1.4.20-SNAPSHOT"
   :description "KR Jena bindings."
-  :parent [edu.ucdenver.ccp/kr-jena "1.4.20-SNAPSHOT" :relative-path "../pom.xml"]
   :parent-project {:path "../../project.clj"
                    :inherit [:dependencies :license]
                    :only-deps [org.clojure/clojure
