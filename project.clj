@@ -16,5 +16,8 @@
                  [commons-codec "1.6"]
                  [com.stuartsierra/dependency "0.1.1"]
                  [org.slf4j/slf4j-log4j12 "1.6.5"]]
+  :plugins [[lein-sub "0.3.0"]]
   :pom-plugins [[com.theoryinpractcise/clojure-maven-plugin "1.3.9"]]
-  :profiles {:test {:dependencies [[junit "3.8.1"]]}})
+  :profiles {:test {:dependencies [[junit "3.8.1"]]}}
+  :sub ["kr-core" "kr-jena/kr-jena-core" "kr-jena"
+        "kr-sesame/kr-sesame-core" "kr-sesame"])
