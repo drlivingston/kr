@@ -5,6 +5,6 @@
                    :only-deps [org.clojure/clojure
                                org.clojure/java.classpath
                                com.stuartsierra/dependency]}
-  :plugins [[lein-parent-mg "0.2.2"]]
+  :plugins [[lein-parent "0.2.1"]]
   :source-paths ["src/main/clojure" "src/test/clojure"]
   :test-paths ["src/test/clojure"])

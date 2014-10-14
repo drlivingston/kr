@@ -11,7 +11,7 @@
                                commons-logging
                                commons-codec
                                org.slf4j/slf4j-log4j12]}
-  :plugins [[lein-parent-mg "0.2.2"]]
+  :plugins [[lein-parent "0.2.1"]]
   :profiles {:test {:dependencies [[edu.ucdenver.ccp/kr-core "1.4.20-SNAPSHOT"]]}}
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"])
