@@ -14,7 +14,7 @@
     <clojure.version>1.4.0</clojure.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <ver.arq>2.10.1</ver.arq>
+    <ver.arq>3.0.0</ver.arq>
     <!--<ver.sesame>2.7.1</ver.sesame>-->
     <ver.sesame>2.6.10</ver.sesame>
     <!--<ver.sesame>2.6.8</ver.sesame>-->
@@ -24,7 +24,7 @@
   </properties>
 
   <groupId>edu.ucdenver.ccp</groupId>
-  <version>1.4.20-SNAPSHOT</version>
+  <version>1.4.21-SNAPSHOT</version>
   <artifactId>kr</artifactId>
   <packaging>pom</packaging>
 
