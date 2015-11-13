@@ -9,7 +9,7 @@
 
   (import 
    ;interfaces
-   (com.hp.hpl.jena.query QueryFactory
+   (org.apache.jena.query QueryFactory
                           QueryExecutionFactory
                           QueryExecution
                           Query
@@ -43,7 +43,7 @@
 ;; (defmethod clj-ify org.openrdf.query.TupleQueryResult [results]
 ;;   (result-map (jena-iteration-seq results)))
 
-;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
+;; (defmethod clj-ify org.apache.jena.rdf.model.impl.LiteralImpl [kb l] 
 ;;   (.getValue l))
 
 

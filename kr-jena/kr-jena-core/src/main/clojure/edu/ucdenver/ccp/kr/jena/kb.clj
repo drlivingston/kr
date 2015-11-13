@@ -4,10 +4,10 @@
        edu.ucdenver.ccp.kr.sparql
        edu.ucdenver.ccp.kr.jena.rdf
        edu.ucdenver.ccp.kr.jena.sparql)
-  (import com.hp.hpl.jena.query.DatasetFactory
-          com.hp.hpl.jena.sparql.core.DatasetImpl
-          com.hp.hpl.jena.graph.Graph
-          com.hp.hpl.jena.rdf.model.Model))
+  (import org.apache.jena.query.DatasetFactory
+          org.apache.jena.sparql.core.DatasetImpl
+          org.apache.jena.graph.Graph
+          org.apache.jena.rdf.model.Model))
 
 ;;; --------------------------------------------------------
 ;;; specials and types
@@ -183,7 +183,7 @@
 
 
 (defn new-jena-kb
-  ([] (new-jena-kb (com.hp.hpl.jena.query.DatasetFactory/createMem)))
+  ([] (new-jena-kb (org.apache.jena.query.DatasetFactory/createMem)))
   ([dataset]
      (jena-initialize
       (initialize-ns-mappings
@@ -191,7 +191,7 @@
 
 (defn jena-kb-from-model [model]
   ;;creates a dataset with this model as the default model
-  (let [dataset (com.hp.hpl.jena.query.DatasetFactory/create model)]
+  (let [dataset (org.apache.jena.query.DatasetFactory/create model)]
     (new-jena-kb dataset)))
 
 ;; (defn new-jena-server [model-factory]
@@ -212,12 +212,12 @@
 (defmethod kb :jena-mem [_]
   (new-jena-kb))
 
-(defmethod kb com.hp.hpl.jena.sparql.core.DatasetImpl [arg]
+(defmethod kb org.apache.jena.sparql.core.DatasetImpl [arg]
   (if (class? arg)
     (new-jena-kb)
     (new-jena-kb arg)))
 
-(defmethod kb com.hp.hpl.jena.rdf.model.ModelCon [arg]
+(defmethod kb org.apache.jena.rdf.model.ModelCon [arg]
   (if (class? arg)
     (new-jena-kb)
     (jena-kb-from-model arg)))

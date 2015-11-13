@@ -6,20 +6,20 @@
        [clojure.java.io :exclude (resource)])
   (import java.io.IOException
 
-          com.hp.hpl.jena.graph.Graph
-          com.hp.hpl.jena.graph.Triple
-          com.hp.hpl.jena.graph.GraphMaker
-          com.hp.hpl.jena.rdf.model.Model
-          com.hp.hpl.jena.rdf.model.Property
-          com.hp.hpl.jena.rdf.model.RDFNode
-          com.hp.hpl.jena.rdf.model.Resource
-          com.hp.hpl.jena.rdf.model.Statement
-          com.hp.hpl.jena.rdf.model.StmtIterator
-          com.hp.hpl.jena.rdf.model.AnonId
+          org.apache.jena.graph.Graph
+          org.apache.jena.graph.Triple
+          org.apache.jena.graph.GraphMaker
+          org.apache.jena.rdf.model.Model
+          org.apache.jena.rdf.model.Property
+          org.apache.jena.rdf.model.RDFNode
+          org.apache.jena.rdf.model.Resource
+          org.apache.jena.rdf.model.Statement
+          org.apache.jena.rdf.model.StmtIterator
+          org.apache.jena.rdf.model.AnonId
           
-          com.hp.hpl.jena.util.FileManager
+          org.apache.jena.util.FileManager
           
-          com.hp.hpl.jena.datatypes.TypeMapper))
+          org.apache.jena.datatypes.TypeMapper))
 
 
 ;;; --------------------------------------------------------
@@ -42,7 +42,7 @@
 ;; should we implement the default jena stores?
 ;;this is a place holder while decisions are made about how to represent models
 (defn model [kb]
-  (if (instance? com.hp.hpl.jena.rdf.model.ModelCon kb)
+  (if (instance? org.apache.jena.rdf.model.ModelCon kb)
     kb
     (or (get kb :active-model)
         (default-model kb))))
@@ -60,7 +60,7 @@
 
 (defn named-model [kb name]
   (cond
-   (instance? com.hp.hpl.jena.rdf.model.ModelCon name) name
+   (instance? org.apache.jena.rdf.model.ModelCon name) name
    (nil? name) (default-model kb)
    (= "" name) (default-model kb)
    :else (.getNamedModel (:dataset kb)
@@ -113,7 +113,7 @@
 
 
 ;;how to get literal types for jena from a URI
-;; (.getTypeByName (com.hp.hpl.jena.datatypes.TypeMapper/getInstance) 
+;; (.getTypeByName (org.apache.jena.datatypes.TypeMapper/getInstance) 
 ;;                 (str (resource my-jena-kb 'xsd/int)))
 
 (defn jena-create-literal 
@@ -131,7 +131,7 @@
 (defn jena-create-statement 
   ([kb [s p o]] (jena-create-statement kb s p o))
   ([kb s p o]
-     (.createStatement ^com.hp.hpl.jena.rdf.model.impl.ModelCom (model kb)
+     (.createStatement ^org.apache.jena.rdf.model.impl.ModelCom (model kb)
                        ^Resource (resource kb s)
                        ^Property (property kb p)
                        ^RDFNode (object kb o))))
@@ -160,7 +160,7 @@
 
 (defn literal-to-value [kb l]
   (let [val (.getValue l)]
-    (if (instance? com.hp.hpl.jena.datatypes.BaseDatatype$TypedValue val)
+    (if (instance? org.apache.jena.datatypes.BaseDatatype$TypedValue val)
       (. val lexicalValue)
       val)))
 
@@ -171,11 +171,16 @@
       lang)))
 
 (defn literal-type-or-language [kb l]
-  (or (let [dt (.getDatatypeURI l)]
-        (and dt
-             (convert-string-to-sym kb dt)))
-      (literal-language l)))
-      ;;(.getLanguage l)))
+  (let [dt (.getDatatypeURI l)
+        sym (and dt
+                           (convert-string-to-sym kb dt))]
+    (if (or (= 'xsd/string sym) (= 'rdf/langString sym))
+      (literal-language l)
+      sym
+      )
+    )
+  )
+;;(.getLanguage l)))
 
 (defn literal-to-clj [kb l]
   (clj-ify-literal kb l 
@@ -204,16 +209,16 @@
         (clj-ify kb (.getObject s))))
 
 ;; statement pieces
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.ResourceImpl [kb r] 
+(defmethod clj-ify org.apache.jena.rdf.model.impl.ResourceImpl [kb r] 
   (resource-to-sym kb r))
 
-(defmethod clj-ify com.hp.hpl.jena.graph.Node_URI [kb r] 
+(defmethod clj-ify org.apache.jena.graph.Node_URI [kb r] 
   (uri-to-sym kb r))
 
-(defmethod clj-ify com.hp.hpl.jena.graph.Node_Blank [kb b]
+(defmethod clj-ify org.apache.jena.graph.Node_Blank [kb b]
   (symbol *anon-ns-name* (str (.getLabelString (.getBlankNodeId b)))))
 
-(defmethod clj-ify com.hp.hpl.jena.graph.Node_Literal [kb l]
+(defmethod clj-ify org.apache.jena.graph.Node_Literal [kb l]
   (clj-ify-literal kb l 
                    literal-node-to-value 
                    literal-to-string-value 
@@ -222,13 +227,13 @@
 
   ;;(.getLiteralValue l))
 
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.Literal [kb l]
+(defmethod clj-ify org.apache.jena.rdf.model.Literal [kb l]
   (clj-ify-literal kb l 
                    literal-to-value 
                    literal-to-string-value 
                    literal-type-or-language))
 
-(defmethod clj-ify com.hp.hpl.jena.datatypes.BaseDatatype$TypedValue [kb l]
+(defmethod clj-ify org.apache.jena.datatypes.BaseDatatype$TypedValue [kb l]
   (clj-ify-literal kb l 
                    literal-to-value 
                    literal-to-string-value 
@@ -238,27 +243,27 @@
 
 ;; Properties are resources - nothing to do special
 ;;   unless meta data is of interest
-;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.PropertyImpl [p]
+;; (defmethod clj-ify org.apache.jena.rdf.model.impl.PropertyImpl [p]
 ;;   (resource-to-sym p))
-;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.LiteralImpl [kb l] 
+;; (defmethod clj-ify org.apache.jena.rdf.model.impl.LiteralImpl [kb l] 
 ;;   (literal-to-clj kb l))
 
-;; (defmethod clj-ify com.hp.hpl.jena.rdf.model.Literal [kb l] 
+;; (defmethod clj-ify org.apache.jena.rdf.model.Literal [kb l] 
 ;;   (.getValue l))
  ;;(literal-to-clj kb l))
 
 ;;(.getValue l))
 
 ;; statements
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.StatementImpl [kb s] 
+(defmethod clj-ify org.apache.jena.rdf.model.impl.StatementImpl [kb s] 
   (clj-ify-statement kb s))
 
-(defmethod clj-ify com.hp.hpl.jena.graph.Triple [kb s] 
+(defmethod clj-ify org.apache.jena.graph.Triple [kb s] 
   (clj-ify-statement kb s))
 
 
 ;; collections of clj-ifiable things
-(defmethod clj-ify com.hp.hpl.jena.rdf.model.impl.StmtIteratorImpl [kb s]
+(defmethod clj-ify org.apache.jena.rdf.model.impl.StmtIteratorImpl [kb s]
   (clj-ify kb (or (iterator-seq s)
                   '())))
 
